@@ -12,7 +12,7 @@ function App() {
           <p>
             A smart tool powered by AI that tells you what to do depending on humidity, temperature, water, and lighting.
           </p>
-          <a href="/dashboard" className="btn-primary">Go to Dashboard</a>
+          <a href="/Dashboard.jsx" className="btn-primary">Go to Dashboard</a>
         </div>
       </section>
 
@@ -46,7 +46,7 @@ function App() {
       <section className="cta">
         <h2>Get Started Now</h2>
         <p>Sign up to monitor and manage your farm in real-time!</p>
-        <a href="/login" className="btn-secondary">Sign Up / Login</a>
+        <a href="/login.jsx" className="btn-secondary">Sign Up / Login</a>
       </section>
 
       {/* Footer */}
