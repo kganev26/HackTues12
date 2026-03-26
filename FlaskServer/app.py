@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import psycopg2
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
@@ -25,6 +26,16 @@ def init_db():
             moisture REAL NOT NULL
         );
     ''')
+    cur.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            username VARCHAR(50) UNIQUE NOT NULL,
+            firstname VARCHAR(50) NOT NULL,
+            lastname VARCHAR(50) NOT NULL,
+            password_hash VARCHAR(255) NOT NULL
+        );
+
+''')
     # Turn it into a high-speed TimescaleDB hypertable
     cur.execute("SELECT create_hypertable('sensor_data', 'time', if_not_exists => TRUE);")
     
@@ -111,6 +122,45 @@ def get_history():
     data_list.reverse()
 
     return jsonify(data_list), 200
+
+
+@app.route('/register', methods=['POST'])
+def register_user():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password') # The raw password from the frontend
+    firstname = data.get('firtsname')
+    lastname = data.get('firtsname')
+
+    # 1. Basic check to make sure they didn't leave things blank
+    if not username or not password or not firstname or not lastname:
+        return jsonify({'error': 'Username and password are required!'}), 400
+
+    # 2. THE SECURITY MAGIC: Hash the password
+    hashed_password = generate_password_hash(password)
+
+    # 3. Save it to the database
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        cur.execute('''
+            INSERT INTO users (username, firstname, lastname, password_hash,) 
+            VALUES (%s, %s, %s, %s, %s) RETURNING id;
+        ''', (username, firstname, lastname, hashed_password))
+        
+        new_user_id = cur.fetchone()[0] # Grab the new ID so the frontend knows who they are
+        conn.commit()
+        return jsonify({'status': 'success', 'user_id': new_user_id, 'message': 'Farmer registered!'}), 201
+        
+    except psycopg2.errors.UniqueViolation:
+        # This catches if someone tries to use a username that already exists
+        conn.rollback()
+        return jsonify({'error': 'Username already taken.'}), 409
+        
+    finally:
+        cur.close()
+        conn.close()
 
 if __name__ == '__main__':
     # Стартираме сървъра на порт 5500 и слушаме от всички IP-та (0.0.0.0)
