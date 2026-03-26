@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 export function AboutSection() {
   return (
     <section className="py-32 px-6 md:px-12 bg-gradient-to-b from-stone-50 to-stone-100">
@@ -31,6 +33,12 @@ export function AboutSection() {
             It empowers farmers to care not only for their crops, but also for the planet—creating a balance 
             between technological progress and ecological preservation.
           </p>
+          <Link
+            href="/about"
+            className="inline-block mt-4 text-emerald-700 font-medium hover:text-emerald-900 transition-colors border-b border-emerald-700 hover:border-emerald-900 pb-0.5"
+          >
+            Read More
+          </Link>
         </div>
       </div>
     </section>
