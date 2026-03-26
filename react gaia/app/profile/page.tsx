@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, LogOut, User } from "lucide-react"
+import { ArrowLeft, LogOut, User, LogIn } from "lucide-react"
 
 const API_URL = "/api"
 
@@ -186,14 +186,32 @@ export default function ProfilePage() {
             </div>
           </div>
         ) : (
-          <div className="text-center">
-            <p className="text-gray-400 text-sm mb-4">You are not signed in.</p>
-            <Link
-              href="/login"
-              className="px-5 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl text-sm font-bold transition-colors"
-            >
-              Go to Login
-            </Link>
+          <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+            {/* Card header */}
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
+              <div className="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center">
+                <User className="w-5 h-5 text-gray-300" />
+              </div>
+              <span className="text-sm font-semibold text-gray-400">Account Details</span>
+            </div>
+
+            {/* Body */}
+            <div className="px-6 py-10 flex flex-col items-center gap-6 text-center">
+              <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center">
+                <LogIn className="w-7 h-7 text-amber-400" />
+              </div>
+              <div>
+                <p className="text-gray-700 font-semibold text-base mb-1">You are not signed in</p>
+                <p className="text-gray-400 text-sm">Sign in to view and manage your account details.</p>
+              </div>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl text-sm font-bold transition-colors"
+              >
+                <LogIn className="w-4 h-4" />
+                Go to Login
+              </Link>
+            </div>
           </div>
         )}
       </div>

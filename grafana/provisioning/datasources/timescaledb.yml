@@ -4,7 +4,7 @@ datasources:
   - name: TimescaleDB
     type: postgres
     uid: timescaledb-smartfarm
-    url: 10.35.212.104:5432
+    url: 10.210.46.104:5432
     database: smartfarm
     user: farm_admin
     secureJsonData:
@@ -13,4 +13,5 @@ datasources:
       sslmode: disable
       postgresVersion: 1500
       timescaledb: true
+      timezone: Europe/Sofia
     editable: true
