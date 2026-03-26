@@ -6,6 +6,7 @@ import psycopg2
 from datetime import datetime, timedelta
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
+import google.generativeai as genai
 
 MAC_REGEX = re.compile(r'^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$')
 
@@ -56,6 +57,12 @@ def init_db():
         );
     ''')
     cur.execute("SELECT create_hypertable('sensor_data', 'time', if_not_exists => TRUE);")
+
+    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS agriculture VARCHAR(500);")
+    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS country VARCHAR(100);")
+    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS province VARCHAR(100);")
+    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS gender VARCHAR(20);")
+    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS birthyear VARCHAR(4);")
 
     conn.commit()
     cur.close()
@@ -155,6 +162,9 @@ def register_user():
     password = data.get('password')
     firstname = data.get('firstname')
     lastname = data.get('lastname')
+    agriculture = data.get('agriculture') or None
+    country = data.get('country') or None
+    province = data.get('province') or None
 
     if not username or not password or not firstname or not lastname:
         return jsonify({'message': 'Username and password are required!'}), 400
@@ -166,9 +176,9 @@ def register_user():
 
     try:
         cur.execute('''
-            INSERT INTO users (username, firstname, lastname, password_hash)
-            VALUES (%s, %s, %s, %s) RETURNING id;
-        ''', (username, firstname, lastname, hashed_password))
+            INSERT INTO users (username, firstname, lastname, password_hash, agriculture, country, province)
+            VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;
+        ''', (username, firstname, lastname, hashed_password, agriculture, country, province))
 
         new_user_id = cur.fetchone()[0]
         conn.commit()
@@ -179,7 +189,12 @@ def register_user():
             'username': username,
             'firstname': firstname,
             'lastname': lastname,
-            'mac_address': None
+            'mac_address': None,
+            'agriculture': agriculture,
+            'country': country,
+            'province': province,
+            'gender': None,
+            'birthyear': None,
         }
 
         return jsonify({'token': token, 'user': user_obj}), 201
@@ -205,7 +220,7 @@ def login_user():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute(
-        'SELECT id, username, firstname, lastname, password_hash, mac_address FROM users WHERE username=%s',
+        'SELECT id, username, firstname, lastname, password_hash, mac_address, agriculture, country, province, gender, birthyear FROM users WHERE username=%s',
         (username,)
     )
     user_row = cur.fetchone()
@@ -215,7 +230,7 @@ def login_user():
     if not user_row:
         return jsonify({'message': 'Invalid credentials'}), 401
 
-    user_id, username_db, firstname_db, lastname_db, password_hash_db, mac_address_db = user_row
+    user_id, username_db, firstname_db, lastname_db, password_hash_db, mac_address_db, agriculture_db, country_db, province_db, gender_db, birthyear_db = user_row
 
     if not check_password_hash(password_hash_db, password):
         return jsonify({'message': 'Invalid credentials'}), 401
@@ -226,7 +241,12 @@ def login_user():
         'username': username_db,
         'firstname': firstname_db,
         'lastname': lastname_db,
-        'mac_address': mac_address_db
+        'mac_address': mac_address_db,
+        'agriculture': agriculture_db,
+        'country': country_db,
+        'province': province_db,
+        'gender': gender_db,
+        'birthyear': birthyear_db,
     }
 
     return jsonify({'token': token, 'user': user_obj}), 200
@@ -242,7 +262,7 @@ def get_profile():
     try:
         cur = conn.cursor()
         cur.execute(
-            'SELECT id, username, firstname, lastname, mac_address FROM users WHERE id=%s',
+            'SELECT id, username, firstname, lastname, mac_address, agriculture, country, province, gender, birthyear FROM users WHERE id=%s',
             (user_id,)
         )
         row = cur.fetchone()
@@ -258,7 +278,12 @@ def get_profile():
         'username': row[1],
         'firstname': row[2],
         'lastname': row[3],
-        'mac_address': row[4]
+        'mac_address': row[4],
+        'agriculture': row[5],
+        'country': row[6],
+        'province': row[7],
+        'gender': row[8],
+        'birthyear': row[9],
     }), 200
 
 
@@ -307,6 +332,91 @@ def remove_mac():
         conn.close()
 
     return jsonify({'message': 'MAC address removed'}), 200
+
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    user_id, err_response, err_code = get_user_id_from_request()
+    if err_response:
+        return err_response, err_code
+
+    user_message = (request.json or {}).get('message', '').strip()
+    if not user_message:
+        return jsonify({'message': 'No message provided'}), 400
+
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            'SELECT username, firstname, lastname, agriculture, country, province, gender, birthyear FROM users WHERE id=%s',
+            (user_id,)
+        )
+        user_row = cur.fetchone()
+        cur.execute('''
+            SELECT time, temperature, moisture FROM sensor_data
+            WHERE user_id = %s ORDER BY time DESC LIMIT 20
+        ''', (user_id,))
+        sensor_rows = cur.fetchall()
+    finally:
+        cur.close()
+        conn.close()
+
+    if not user_row:
+        return jsonify({'message': 'User not found'}), 404
+
+    username, firstname, lastname, agriculture, country, province, gender, birthyear = user_row
+
+    system_prompt = f"You are GAIA, an AI farming assistant helping {firstname} {lastname} (@{username}).\n"
+    system_prompt += "Farm profile:\n"
+    system_prompt += f"- Agriculture: {agriculture or 'Not specified'}\n"
+    system_prompt += f"- Location: {', '.join(filter(None, [province, country])) or 'Not specified'}\n"
+    system_prompt += f"- Gender: {gender or 'Not specified'}\n"
+    system_prompt += f"- Birth year: {birthyear or 'Not specified'}\n\n"
+    system_prompt += "Recent sensor readings (newest first):\n"
+
+    if sensor_rows:
+        for r in sensor_rows:
+            system_prompt += f"  {r[0].strftime('%Y-%m-%d %H:%M')} | Temp: {r[1]:.1f}°C | Moisture: {r[2]:.1f}%\n"
+    else:
+        system_prompt += "  No sensor data available yet.\n"
+
+    system_prompt += "\nGive concise, practical farming advice based on their data."
+
+    api_key = os.getenv('GEMINI_API_KEY')
+    if not api_key:
+        return jsonify({'message': 'AI service not configured (missing GEMINI_API_KEY)'}), 503
+
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=system_prompt)
+    response = model.generate_content(user_message)
+    return jsonify({'reply': response.text}), 200
+
+
+@app.route('/user/profile', methods=['PATCH'])
+def update_profile():
+    user_id, err_response, err_code = get_user_id_from_request()
+    if err_response:
+        return err_response, err_code
+
+    data = request.json or {}
+    ALLOWED = {'gender', 'birthyear'}
+    updates = {k: v for k, v in data.items() if k in ALLOWED}
+    if not updates:
+        return jsonify({'message': 'No valid fields to update'}), 400
+
+    set_clause = ', '.join(f"{k} = %s" for k in updates)
+    values = list(updates.values()) + [user_id]
+
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(f'UPDATE users SET {set_clause} WHERE id = %s', values)
+        conn.commit()
+    finally:
+        cur.close()
+        conn.close()
+
+    return jsonify(updates), 200
 
 
 if __name__ == '__main__':

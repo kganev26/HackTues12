@@ -43,7 +43,7 @@ export function HeroSection() {
           style={{ animationDelay: '500ms' }}
         >
           <Link
-            href="/profile"
+            href="/chat"
             className="inline-flex items-center gap-2 px-10 py-4 bg-green-700 hover:bg-green-800 text-white rounded-full font-bold text-lg transition-all duration-300 shadow-lg shadow-green-700/40 hover:-translate-y-1 hover:scale-105 hover:shadow-xl hover:shadow-green-700/50"
           >
             Get Started
