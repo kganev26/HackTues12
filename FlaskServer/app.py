@@ -129,8 +129,8 @@ def register_user():
     data = request.json
     username = data.get('username')
     password = data.get('password') # The raw password from the frontend
-    firstname = data.get('firtsname')
-    lastname = data.get('firtsname')
+    firstname = data.get('firstname')
+    lastname = data.get('lastname')
 
     # 1. Basic check to make sure they didn't leave things blank
     if not username or not password or not firstname or not lastname:
