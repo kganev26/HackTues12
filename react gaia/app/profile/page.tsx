@@ -13,6 +13,11 @@ interface CurrentUser {
   firstname: string
   lastname: string
   mac_address: string | null
+  agriculture: string | null
+  country: string | null
+  province: string | null
+  gender: string | null
+  birthyear: string | null
 }
 
 export default function ProfilePage() {
@@ -21,6 +26,16 @@ export default function ProfilePage() {
   const [macEditing, setMacEditing] = useState(false)
   const [macError, setMacError] = useState("")
   const [macSaving, setMacSaving] = useState(false)
+
+  const [genderEditing, setGenderEditing] = useState(false)
+  const [genderValue, setGenderValue] = useState("")
+  const [genderSaving, setGenderSaving] = useState(false)
+
+  const [birthyearEditing, setBirthyearEditing] = useState(false)
+  const [birthyearValue, setBirthyearValue] = useState("")
+  const [birthyearSaving, setBirthyearSaving] = useState(false)
+
+  const [profileError, setProfileError] = useState("")
   const router = useRouter()
 
   useEffect(() => {
@@ -47,6 +62,32 @@ export default function ProfilePage() {
     localStorage.removeItem("token")
     localStorage.removeItem("currentUser")
     router.push("/login")
+  }
+
+  const handleSaveProfile = async (field: string, value: string) => {
+    setProfileError("")
+    if (field === "gender") setGenderSaving(true)
+    else setBirthyearSaving(true)
+    const token = localStorage.getItem("token")
+    try {
+      const res = await fetch(`${API_URL}/user/profile`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ [field]: value }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setProfileError(data.message || "Failed to save"); return }
+      const updated = { ...user!, [field]: value }
+      setUser(updated)
+      localStorage.setItem("currentUser", JSON.stringify(updated))
+      if (field === "gender") setGenderEditing(false)
+      else setBirthyearEditing(false)
+    } catch {
+      setProfileError("Cannot connect to server")
+    } finally {
+      if (field === "gender") setGenderSaving(false)
+      else setBirthyearSaving(false)
+    }
   }
 
   const handleSaveMac = async () => {
@@ -183,6 +224,130 @@ export default function ProfilePage() {
                 )}
                 {macError && <p className="mt-2 text-red-500 text-xs">{macError}</p>}
               </div>
+
+              {/* Agriculture */}
+              {user.agriculture && (
+                <div className="px-6 py-4">
+                  <span className="text-xs uppercase tracking-widest text-gray-700 font-medium block mb-2">Agriculture</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {user.agriculture.split(",").map((a) => (
+                      <span key={a} className="px-2.5 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-xs font-semibold capitalize">
+                        {a.replace(/_/g, " ")}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Country / Province */}
+              {(user.country || user.province) && (
+                <div className="px-6 py-4 flex justify-between items-center">
+                  <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">Region</span>
+                  <span className="text-gray-900 font-semibold text-right">
+                    {[user.province, user.country].filter(Boolean).join(", ")}
+                  </span>
+                </div>
+              )}
+
+              {/* Gender */}
+              <div className="px-6 py-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">Gender</span>
+                  {!genderEditing && (
+                    <div className="flex items-center gap-3">
+                      {user.gender ? (
+                        <span className="text-gray-900 font-semibold capitalize">{user.gender.replace(/_/g, " ")}</span>
+                      ) : (
+                        <span className="text-gray-300 text-sm italic">Not set</span>
+                      )}
+                      <button
+                        onClick={() => { setGenderValue(user.gender ?? ""); setGenderEditing(true) }}
+                        className="text-xs text-amber-500 hover:text-amber-600 font-semibold transition-colors"
+                      >
+                        {user.gender ? "Change" : "Set"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {genderEditing && (
+                  <div className="mt-3 flex gap-2">
+                    <select
+                      value={genderValue}
+                      onChange={(e) => setGenderValue(e.target.value)}
+                      className="flex-1 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 text-sm outline-none focus:border-amber-400 transition-colors"
+                    >
+                      <option value="">Prefer not to say</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <button
+                      onClick={() => handleSaveProfile("gender", genderValue)}
+                      disabled={genderSaving}
+                      className="px-4 py-2 bg-green-700 hover:bg-green-800 disabled:opacity-40 text-white rounded-lg text-sm font-bold transition-colors"
+                    >
+                      {genderSaving ? "Saving…" : "Save"}
+                    </button>
+                    <button
+                      onClick={() => setGenderEditing(false)}
+                      className="px-3 py-2 text-gray-400 hover:text-gray-600 rounded-lg text-sm transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Birth Year */}
+              <div className="px-6 py-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">Birth Year</span>
+                  {!birthyearEditing && (
+                    <div className="flex items-center gap-3">
+                      {user.birthyear ? (
+                        <span className="text-gray-900 font-semibold">{user.birthyear}</span>
+                      ) : (
+                        <span className="text-gray-300 text-sm italic">Not set</span>
+                      )}
+                      <button
+                        onClick={() => { setBirthyearValue(user.birthyear ?? ""); setBirthyearEditing(true) }}
+                        className="text-xs text-amber-500 hover:text-amber-600 font-semibold transition-colors"
+                      >
+                        {user.birthyear ? "Change" : "Set"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {birthyearEditing && (
+                  <div className="mt-3 flex gap-2">
+                    <select
+                      value={birthyearValue}
+                      onChange={(e) => setBirthyearValue(e.target.value)}
+                      className="flex-1 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 text-sm outline-none focus:border-amber-400 transition-colors"
+                    >
+                      <option value="">Select year</option>
+                      {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - 10 - i).map((y) => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => handleSaveProfile("birthyear", birthyearValue)}
+                      disabled={birthyearSaving}
+                      className="px-4 py-2 bg-green-700 hover:bg-green-800 disabled:opacity-40 text-white rounded-lg text-sm font-bold transition-colors"
+                    >
+                      {birthyearSaving ? "Saving…" : "Save"}
+                    </button>
+                    <button
+                      onClick={() => setBirthyearEditing(false)}
+                      className="px-3 py-2 text-gray-400 hover:text-gray-600 rounded-lg text-sm transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {profileError && <p className="px-6 pb-4 text-red-500 text-xs">{profileError}</p>}
             </div>
           </div>
         ) : (
