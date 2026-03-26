@@ -1,3 +1,5 @@
+"use client"
+
 import { ChevronRight, Cpu, Leaf, Droplets } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -32,7 +34,8 @@ export function FeaturesSection() {
       {features.map((feature, index) => (
         <div
           key={index}
-          className="group bg-card flex flex-col flex-1 min-w-[300px] max-w-[360px] shadow-xl rounded transition-transform duration-300 hover:-translate-y-2 overflow-hidden"
+          className="group bg-card flex flex-col flex-1 min-w-[300px] max-w-[360px] shadow-xl rounded transition-transform duration-300 hover:-translate-y-2 overflow-hidden animate-fade-up"
+          style={{ animationDelay: `${index * 120}ms` }}
         >
           <div className="p-10 min-h-[200px]">
             <div className="flex items-center gap-3 mb-4">
