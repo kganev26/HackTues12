@@ -1,7 +1,9 @@
 import React from "react";
 import "./App.css";
+import { useNavigate } from "react-router-dom";
 
 function App() {
+  const navigate = useNavigate(); 
   return (
     <div className="App">
 
@@ -12,7 +14,9 @@ function App() {
           <p>
             A smart tool powered by AI that tells you what to do depending on humidity, temperature, water, and lighting.
           </p>
-          <a href="/Dashboard.jsx" className="btn-primary">Go to Dashboard</a>
+           <button className="btn-primary" onClick={() => navigate("/dashboard")}>
+            Go to Dashboard
+          </button>
         </div>
       </section>
 
@@ -46,7 +50,9 @@ function App() {
       <section className="cta">
         <h2>Get Started Now</h2>
         <p>Sign up to monitor and manage your farm in real-time!</p>
-        <a href="/login.jsx" className="btn-secondary">Sign Up / Login</a>
+        <button className="btn-secondary" onClick={() => navigate("/login")}>
+          Sign Up / Login
+        </button>
       </section>
 
       {/* Footer */}
