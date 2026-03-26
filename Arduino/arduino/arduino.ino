@@ -11,8 +11,7 @@
 // --- WiFi и Сървър настройки ---
 const char* ssid = "Daniel's S24";
 const char* password = "BatManSavage1976";
-const char* serverURL = "http://192.168.248.104:5500/cardnum";  
-
+const char* serverURL = "http://10.35.212.3:5500/cardnum";
 // --- Инициализация на сензорите ---
 DHT dht(DHTPIN, DHTTYPE);
 

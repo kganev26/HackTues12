@@ -16,7 +16,7 @@ def receive_data():
         dht_t = data.get('dht_temp', 'N/A')
         dht_h = data.get('dht_hum', 'N/A')
         water = data.get('water_detected', False)
-        
+            
         # Принтираме ги красиво в конзолата на сървъра
         print("\n" + "="*40)
         print("🌍 НОВИ МЕТЕОРОЛОГИЧНИ ДАННИ ПОЛУЧЕНИ 🌍")
