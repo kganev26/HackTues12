@@ -1,71 +1,66 @@
 import { useState, useEffect } from "react";
 import "./login.css";
 
-// Примерна снимка на интелигентна ферма за растения (можеш да замениш с локален файл)
 const farmImage = "https://scx2.b-cdn.net/gfx/news/hires/2024/farming.jpg";
+const API_URL = "https://your-api.com"; 
+
 export default function App() {
   const [isLogin, setIsLogin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const currentUser = localStorage.getItem("currentUser");
-    if (currentUser) setIsLoggedIn(true);
+    const token = localStorage.getItem("token");
+    if (token) setIsLoggedIn(true);
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = new FormData(e.target);
 
-    const firstName = form.get("firstName");
-    const lastName = form.get("lastName");
-    const username = form.get("username");
-    const password = form.get("password");
+    const body = {
+      username: form.get("username"),
+      password: form.get("password"),
+      ...(isLogin ? {} : {
+        firstName: form.get("firstName"),
+        lastName: form.get("lastName"),
+      }),
+    };
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    try {
+      const endpoint = isLogin ? "/api/login" : "/api/register";
 
-    if (isLogin) {
-      // 👉 LOGIN
-      const user = users.find(
-        (u) => u.username === username && u.password === password
-      );
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
 
-      if (!user) {
-        setError("Invalid username or password");
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Грешка при заявката");
         return;
       }
 
-      localStorage.setItem("currentUser", JSON.stringify(user));
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("currentUser", JSON.stringify(data.user));
       setIsLoggedIn(true);
       setError("");
-    } else {
-      // 👉 REGISTER
-      const exists = users.find((u) => u.username === username);
 
-      if (exists) {
-        setError("Username already exists");
-        return;
-      }
-
-      const newUser = { firstName, lastName, username, password };
-      users.push(newUser);
-
-      localStorage.setItem("users", JSON.stringify(users));
-      localStorage.setItem("currentUser", JSON.stringify(newUser));
-
-      setIsLoggedIn(true);
-      setError("");
+    } catch (err) {
+      setError("Няма връзка със сървъра");
     }
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("token");
     localStorage.removeItem("currentUser");
     setIsLoggedIn(false);
   };
 
   if (isLoggedIn) {
     const user = JSON.parse(localStorage.getItem("currentUser"));
-
     return (
       <div className="logged-in">
         <h1>Welcome, {user.username} 👋</h1>
@@ -76,15 +71,10 @@ export default function App() {
 
   return (
     <div className="page">
-      {/* LEFT IMAGE */}
       <div className="left">
-        <img
-          src={farmImage}
-          alt="Smart Farm System"
-        />
+        <img src={farmImage} alt="Smart Farm System" />
       </div>
 
-      {/* RIGHT FORM */}
       <div className="right">
         <div className="form-box">
           <h2>{isLogin ? "Login" : "Create Account"}</h2>
@@ -96,7 +86,6 @@ export default function App() {
                   <input name="firstName" placeholder=" " required />
                   <label>First Name</label>
                 </div>
-
                 <div className="input-group">
                   <input name="lastName" placeholder=" " required />
                   <label>Last Name</label>
@@ -116,19 +105,12 @@ export default function App() {
 
             {error && <p className="error">{error}</p>}
 
-            <button type="submit">
-              {isLogin ? "Login" : "Register"}
-            </button>
+            <button type="submit">{isLogin ? "Login" : "Register"}</button>
           </form>
 
           <p className="switch-text">
             {isLogin ? "Don't have an account?" : "Already have an account?"}
-            <span
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError(""); // изчиства предишната грешка при смяна на формата
-              }}
-            >
+            <span onClick={() => { setIsLogin(!isLogin); setError(""); }}>
               {isLogin ? " Register" : " Login"}
             </span>
           </p>
