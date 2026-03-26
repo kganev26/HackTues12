@@ -1,0 +1,178 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* PAGE */
+.page {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* LEFT (IMAGE) */
+.left {
+  width: 50%;
+  height: 100%;
+}
+
+.left img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.4s ease;
+}
+
+.left img:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* RIGHT (FORM) */
+.right {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  padding: 2rem;
+}
+
+/* FORM BOX */
+.form-box {
+  width: 100%;
+  max-width: 25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; /* увеличено разстояние между всички елементи */
+}
+
+.form-box h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #000;
+}
+
+/* INPUT GROUP */
+.input-group {
+  position: relative;
+  margin-bottom: 1rem; /* допълнително разстояние между полетата */
+}
+
+/* INPUT */
+.input-group input {
+  width: 100%;
+  padding: 1rem 0.75rem;
+  border-radius: 0.6rem;
+  border: 0.0625rem solid #ccc;
+  outline: none;
+  font-size: 1rem;
+  color: #000;
+  background: #fff;
+  transition: all 0.25s ease;
+}
+
+.input-group input:focus {
+  background: #f2f2f2;
+  border-color: #6c7a89;
+  box-shadow: 0 0 0 0.125rem rgba(108, 122, 137, 0.2);
+}
+
+/* FLOAT LABEL */
+.input-group label {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  transition: 0.2s;
+  font-size: 0.9rem;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: -0.5rem;
+  font-size: 0.7rem;
+  background: #fff;
+  padding: 0 0.25rem;
+  color: #6c7a89;
+}
+
+/* BUTTON */
+button {
+  margin-top: 1rem; /* бутонът е по-надолу */
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  background: #6c7a89;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #556270;
+}
+
+/* SWITCH TEXT */
+.switch-text {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.switch-text span {
+  color: #4a90e2;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ERROR */
+.error {
+  color: red;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 48rem) {
+  .page {
+    flex-direction: column;
+  }
+
+  .left {
+    width: 100%;
+    height: 15rem; /* малко по-голямо за мобилни устройства */
+  }
+
+  .right {
+    width: 100%;
+    padding: 2rem;
+  }
+}
+
+/* LOGGED IN PAGE */
+.logged-in {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.logged-in h1 {
+  font-size: 2rem;
+}
+
+.logged-in button {
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.7rem;
+  border: none;
+  background: #6c7a89;
+  color: #fff;
+  cursor: pointer;
+}
