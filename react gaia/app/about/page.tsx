@@ -1,3 +1,5 @@
+'use client'
+
 import Link from "next/link"
 import { ArrowLeft, Cpu, Droplets, Leaf, Settings, Users, Globe, Sprout } from "lucide-react"
 import { Footer } from "@/components/footer"
@@ -63,25 +65,51 @@ const sections = [
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-stone-50 to-stone-100 flex flex-col">
+
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#0a0f0c] px-6 py-24 text-center">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(16,185,129,0.12)_0%,_transparent_70%)]" />
         <div className="relative max-w-3xl mx-auto">
+
+          {/* Back link — fades in */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-white/50 hover:text-white font-medium transition-colors mb-10 text-sm"
+            className="inline-flex items-center gap-2 text-white/50 hover:text-white font-medium transition-colors mb-10 text-sm animate-fade-in"
+            style={{ animationDelay: '0ms' }}
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
-          <div className="mb-4">
+
+          {/* Label — fades up */}
+          <div
+            className="mb-4 animate-fade-up"
+            style={{ animationDelay: '80ms' }}
+          >
             <span className="inline-block text-emerald-400 text-sm font-medium tracking-widest uppercase">
               Our Mission
             </span>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">About Gaia</h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-amber-400 mx-auto rounded-full mb-8" />
-          <p className="text-white/60 text-lg leading-relaxed max-w-xl mx-auto">
+
+          {/* Title — fades up, slightly delayed */}
+          <h1
+            className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-up"
+            style={{ animationDelay: '180ms' }}
+          >
+            About Gaia
+          </h1>
+
+          {/* Divider — fades in */}
+          <div
+            className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-amber-400 mx-auto rounded-full mb-8 animate-fade-in"
+            style={{ animationDelay: '320ms' }}
+          />
+
+          {/* Subtitle — fades in, slowest */}
+          <p
+            className="text-white/60 text-lg leading-relaxed max-w-xl mx-auto animate-fade-in"
+            style={{ animationDelay: '420ms' }}
+          >
             An intelligent farming ecosystem built on the belief that technology and nature should work together.
           </p>
         </div>
@@ -89,25 +117,39 @@ export default function AboutPage() {
 
       {/* Accordion */}
       <section className="flex-1 max-w-3xl mx-auto w-full px-6 py-20">
+
+        {/* Section heading — fades up */}
+        <h2
+          className="text-2xl font-semibold text-stone-800 mb-8 animate-fade-up"
+          style={{ animationDelay: '500ms' }}
+        >
+          Explore the project
+        </h2>
+
         <Accordion type="single" collapsible className="space-y-4">
-          {sections.map(({ id, icon: Icon, title, content }) => (
-            <AccordionItem
+          {sections.map(({ id, icon: Icon, title, content }, index) => (
+            <div
               key={id}
-              value={id}
-              className="bg-white rounded-xl shadow-sm border border-stone-200 px-6 overflow-hidden"
+              className="animate-fade-up"
+              style={{ animationDelay: `${560 + index * 60}ms` }}
             >
-              <AccordionTrigger className="text-base font-semibold text-stone-900 hover:no-underline py-5">
-                <span className="flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                    <Icon className="w-4 h-4" />
+              <AccordionItem
+                value={id}
+                className="bg-white rounded-xl shadow-sm border border-stone-200 px-6 overflow-hidden"
+              >
+                <AccordionTrigger className="text-base font-semibold text-stone-900 hover:no-underline py-5">
+                  <span className="flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                      <Icon className="w-4 h-4" />
+                    </span>
+                    {title}
                   </span>
-                  {title}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="text-stone-600 leading-relaxed text-base pb-5">
-                {content}
-              </AccordionContent>
-            </AccordionItem>
+                </AccordionTrigger>
+                <AccordionContent className="text-stone-600 leading-relaxed text-base pb-5">
+                  {content}
+                </AccordionContent>
+              </AccordionItem>
+            </div>
           ))}
         </Accordion>
       </section>

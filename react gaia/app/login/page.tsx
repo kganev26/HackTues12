@@ -62,36 +62,46 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen flex items-center justify-center">
       {/* Background */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ 
-          backgroundImage: `url('https://scx2.b-cdn.net/gfx/news/hires/2024/farming.jpg')` 
+        style={{
+          backgroundImage: `url('https://scx2.b-cdn.net/gfx/news/hires/2024/farming.jpg')`
         }}
       />
-      
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/70" />
-      
+
       {/* Back Link */}
-      <Link 
+      <Link
         href="/"
-        className="absolute top-6 left-6 z-20 flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+        className="absolute top-6 left-6 z-20 flex items-center gap-2 text-white/80 hover:text-white transition-colors animate-fade-in"
+        style={{ animationDelay: '0ms' }}
       >
         <ArrowLeft className="w-5 h-5" />
         <span>Back to Home</span>
       </Link>
-      
+
       {/* Form Container */}
-      <div className="relative z-10 w-full max-w-md px-5">
+      <div
+        className="relative z-10 w-full max-w-md px-5 animate-fade-up"
+        style={{ animationDelay: '150ms' }}
+      >
         <div className="bg-card rounded-3xl shadow-2xl p-12 text-center">
-          <h1 className="text-5xl font-black text-gray-600 tracking-tight mb-0">
+          <h1
+            className="text-5xl font-black text-gray-600 tracking-tight mb-0 animate-fade-up"
+            style={{ animationDelay: '250ms' }}
+          >
             Gaia
           </h1>
-          
-          <h2 className="text-sm text-muted-foreground uppercase tracking-widest font-semibold mb-8">
+
+          <h2
+            className="text-sm text-muted-foreground uppercase tracking-widest font-semibold mb-8 animate-fade-in"
+            style={{ animationDelay: '350ms' }}
+          >
             {isLogin ? "Login" : "Create Account"}
           </h2>
-          
+
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
               <>
@@ -109,7 +119,7 @@ export default function LoginPage() {
                     First Name
                   </label>
                 </div>
-                
+
                 <div className="relative">
                   <input
                     type="text"
@@ -126,7 +136,7 @@ export default function LoginPage() {
                 </div>
               </>
             )}
-            
+
             <div className="relative">
               <input
                 type="text"
@@ -141,7 +151,7 @@ export default function LoginPage() {
                 Username
               </label>
             </div>
-            
+
             <div className="relative">
               <input
                 type="password"
@@ -156,11 +166,11 @@ export default function LoginPage() {
                 Password
               </label>
             </div>
-            
+
             {error && (
               <p className="text-red-500 text-sm">{error}</p>
             )}
-            
+
             <button
               type="submit"
               className="w-full py-4 bg-green-700 hover:bg-green-800 text-white rounded-xl font-bold text-lg transition-all duration-300 hover:-translate-y-0.5"
@@ -168,7 +178,7 @@ export default function LoginPage() {
               {isLogin ? "Login" : "Register"}
             </button>
           </form>
-          
+
           <p className="mt-6 text-sm text-muted-foreground">
             {isLogin ? "Don't have an account?" : "Already have an account?"}
             <button
