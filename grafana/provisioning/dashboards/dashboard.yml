@@ -6,7 +6,5 @@ providers:
     disableDeletion: false
     updateIntervalSeconds: 30
     allowUiUpdates: true
-    ports:
-      - "3001:3001"
     options:
       path: /etc/grafana/provisioning/dashboards
