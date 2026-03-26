@@ -67,20 +67,20 @@ export default function AboutPage() {
     <main className="min-h-screen bg-gradient-to-b from-stone-50 to-stone-100 flex flex-col">
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-[#0a0f0c] px-6 py-24 text-center">
+      <section className="relative overflow-hidden bg-[#0a0f0c] px-6 pt-8 pb-24 text-center">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(16,185,129,0.12)_0%,_transparent_70%)]" />
+
+        {/* Back link — top left */}
+        <Link
+          href="/"
+          className="absolute top-8 left-6 inline-flex items-center gap-2 text-white/50 hover:text-white font-medium transition-colors text-sm animate-fade-in"
+          style={{ animationDelay: '0ms' }}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </Link>
+
         <div className="relative max-w-3xl mx-auto">
-
-          {/* Back link — fades in */}
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-white/50 hover:text-white font-medium transition-colors mb-10 text-sm animate-fade-in"
-            style={{ animationDelay: '0ms' }}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
-
           {/* Label — fades up */}
           <div
             className="mb-4 animate-fade-up"
