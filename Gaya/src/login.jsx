@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./login.css";
 
 const farmImage = "https://scx2.b-cdn.net/gfx/news/hires/2024/farming.jpg";
-const API_URL = "https://your-api.com"; 
+const API_URL = "https://192.168.88.8:5500"; 
 
 export default function App() {
   const [isLogin, setIsLogin] = useState(false);
@@ -22,13 +22,13 @@ export default function App() {
       username: form.get("username"),
       password: form.get("password"),
       ...(isLogin ? {} : {
-        firstName: form.get("firstName"),
-        lastName: form.get("lastName"),
+        firstname: form.get("firstname"),
+        lastname: form.get("lastname"),
       }),
     };
 
     try {
-      const endpoint = isLogin ? "/api/login" : "/api/register";
+      const endpoint = isLogin ? "/login" : "/register";
 
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
