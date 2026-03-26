@@ -21,7 +21,7 @@ def create_jwt_token(user_id, username):
     payload = {
         "user_id": user_id,
         "username": username,
-        "exp": datetime.now(datetime.time.utc) + timedelta(minutes=JWT_EXP_DELTA_MINUTES)
+        "exp": datetime.utcnow() + timedelta(minutes=JWT_EXP_DELTA_MINUTES)
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
@@ -109,7 +109,7 @@ def receive_data():
             user_id = user[0]
 
             cur.execute('INSERT INTO sensor_data (time, temperature, moisture, user_id) VALUES (%s, %s, %s, %s)',
-                    (datetime.now(datetime.timezone.utc), dht_t, dht_h, user_id))
+                    (datetime.utcnow(), dht_t, dht_h, user_id))
             conn.commit()
         finally:
             cur.close()
