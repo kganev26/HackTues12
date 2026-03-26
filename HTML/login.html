@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaia - Smart Farm System</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+    <div id="app">
+        <div id="loggedInView" class="logged-in-container" style="display: none;">
+            <div class="form-box">
+                <h1 id="welcomeMessage"></h1>
+                <p>Успешно влязохте в Gaia.</p>
+                <button onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+
+        <div id="authView" class="main-page">
+            <div class="background-overlay"></div>
+            
+            <div class="form-container">
+                <div class="form-box">
+                    <h1 class="project-logo">Gaia</h1>
+                    <h2 id="formTitle">Create Account</h2>
+
+                    <form id="authForm">
+                        <div id="registerFields">
+                            <div class="input-group">
+                                <input name="firstname" placeholder=" " required>
+                                <label>First Name</label>
+                            </div>
+                            <div class="input-group">
+                                <input name="lastname" placeholder=" " required>
+                                <label>Last Name</label>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <input name="username" placeholder=" " required>
+                            <label>Username</label>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="password" name="password" placeholder=" " required>
+                            <label>Password</label>
+                        </div>
+
+                        <p id="errorMessage" class="error"></p>
+                        <button type="submit" id="submitBtn">Register</button>
+                    </form>
+
+                    <p class="switch-text">
+                        <span id="switchPrompt">Already have an account?</span>
+                        <span id="toggleAuth"> Login</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
