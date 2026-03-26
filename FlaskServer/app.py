@@ -1,11 +1,27 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import os
 import psycopg2
-from datetime import datetime
+from datetime import datetime, timedelta
+import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 CORS(app)
+
+# Use an environment variable in production
+JWT_SECRET = os.getenv("JWT_SECRET", "dev-only-default")
+JWT_ALGORITHM = "HS256"
+JWT_EXP_DELTA_MINUTES = 60
+
+
+def create_jwt_token(user_id, username):
+    payload = {
+        "user_id": user_id,
+        "username": username,
+        "exp": datetime.utcnow() + timedelta(minutes=JWT_EXP_DELTA_MINUTES)
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 def get_db_connection():
     return psycopg2.connect(
@@ -150,13 +166,21 @@ def register_user():
             INSERT INTO users (username, firstname, lastname, password_hash) 
             VALUES (%s, %s, %s, %s) RETURNING id;
         ''', (username, firstname, lastname, hashed_password))
-        
-        new_user_id = cur.fetchone()[0] # Grab the new ID so the frontend knows who they are
+
+        new_user_id = cur.fetchone()[0]  # Grab the new ID so the frontend knows who they are
         conn.commit()
-        print("Successfuly added new user")
-        return jsonify({'status': 'success', 'user_id': new_user_id, 'message': 'Farmer registered!'}), 201
-    
-        
+
+        token = create_jwt_token(new_user_id, username)
+        user_obj = {
+            'id': new_user_id,
+            'username': username,
+            'firstname': firstname,
+            'lastname': lastname
+        }
+
+        print("Successfully added new user")
+        return jsonify({'token': token, 'user': user_obj}), 201
+
     except psycopg2.errors.UniqueViolation:
         # This catches if someone tries to use a username that already exists
         conn.rollback()
@@ -165,6 +189,46 @@ def register_user():
     finally:
         cur.close()
         conn.close()
+
+
+@app.route('/login', methods=['POST'])
+def login_user():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required!'}), 400
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT id, username, firstname, lastname, password_hash FROM users WHERE username=%s', (username,))
+    user_row = cur.fetchone()
+
+    if not user_row:
+        cur.close()
+        conn.close()
+        return jsonify({'message': 'Invalid credentials'}), 401
+
+    user_id, username_db, firstname_db, lastname_db, password_hash_db = user_row
+
+    if not check_password_hash(password_hash_db, password):
+        cur.close()
+        conn.close()
+        return jsonify({'message': 'Invalid credentials'}), 401
+
+    token = create_jwt_token(user_id, username_db)
+    user_obj = {
+        'id': user_id,
+        'username': username_db,
+        'firstname': firstname_db,
+        'lastname': lastname_db
+    }
+
+    cur.close()
+    conn.close()
+    return jsonify({'token': token, 'user': user_obj}), 200
+
 
 if __name__ == '__main__':
     # Стартираме сървъра на порт 5500 и слушаме от всички IP-та (0.0.0.0)
