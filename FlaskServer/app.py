@@ -35,15 +35,20 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
-    
+
     # Create the standard table
     cur.execute('''
         CREATE TABLE IF NOT EXISTS sensor_data (
             time TIMESTAMP NOT NULL,
-            temperature REAL NOT NULL,
-            moisture REAL NOT NULL
+            temperature REAL,
+            moisture REAL
         );
     ''')
+    # Add new sensor columns for humidity, soil moisture, and water detection
+    cur.execute("ALTER TABLE sensor_data ADD COLUMN IF NOT EXISTS humidity REAL;")
+    cur.execute("ALTER TABLE sensor_data ADD COLUMN IF NOT EXISTS soil_moisture REAL;")
+    cur.execute("ALTER TABLE sensor_data ADD COLUMN IF NOT EXISTS water_detected BOOLEAN DEFAULT FALSE;")
+
     cur.execute('''
             CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
@@ -74,25 +79,20 @@ def receive_data():
         if not data:
             return jsonify({"status": "error", "message": "No JSON payload provided"}), 400
 
-        # Извличаме конкретните стойности (само DHT и вода)
-        dht_t = data.get('dht_temp', 'N/A')
-        dht_h = data.get('dht_hum', 'N/A')
+        # Extract all sensor values from the payload
+        dht_t = data.get('dht_temp')
+        dht_h = data.get('dht_hum')
+        soil = data.get('soil_moisture')
         water = data.get('water_detected', False)
-        #mac_addr = data.get('mac_addr', 'N/A')
-            
-        #if not mac_addr or dht_t is None or dht_h is None:
-        #    return jsonify({'error': 'Missing data'}), 400
 
         # Save to database
         conn = get_db_connection()
         cur = conn.cursor()
-        
-        # 1. Lookup who owns this MAC address
-        #cur.execute('SELECT id FROM users WHERE mac_address = %s;', (mac_addr,))
-        #user = cur.fetchone()
-        
-        cur.execute('INSERT INTO sensor_data (time, temperature, moisture) VALUES (%s, %s, %s)',
-                (datetime.now(), dht_t, dht_h))
+
+        cur.execute(
+            'INSERT INTO sensor_data (time, temperature, humidity, soil_moisture, water_detected) VALUES (%s, %s, %s, %s, %s)',
+            (datetime.now(), dht_t, dht_h, soil, water)
+        )
         conn.commit()
         cur.close()
         conn.close()
@@ -113,14 +113,14 @@ def get_history():
     
     # Query Postgres: Get the 15 most recent readings, newest first
     cur.execute('''
-        SELECT time, temperature, moisture 
-        FROM sensor_data 
-        ORDER BY time DESC 
+        SELECT time, temperature, humidity, soil_moisture, water_detected
+        FROM sensor_data
+        ORDER BY time DESC
         LIMIT 15;
     ''')
-    
+
     rows = cur.fetchall()
-    
+
     cur.close()
     conn.close()
 
@@ -128,9 +128,11 @@ def get_history():
     data_list = []
     for row in rows:
         data_list.append({
-            'time': row[0].strftime('%H:%M:%S'), # Just grabbing the hour/min/sec for a clean chart
+            'time': row[0].strftime('%H:%M:%S'),
             'temp': row[1],
-            'moisture': row[2]
+            'humidity': row[2],
+            'soil_moisture': row[3],
+            'water_detected': row[4],
         })
 
     # Since we ordered DESC (newest first) to get the latest, 

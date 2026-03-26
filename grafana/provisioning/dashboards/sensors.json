@@ -1,0 +1,187 @@
+{
+  "id": null,
+  "uid": "gaia-sensors",
+  "title": "GAIA Sensor Dashboard",
+  "tags": ["gaia", "sensors", "smartfarm"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-7d", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Temperature (°C)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "timescaledb-smartfarm" },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "timescaledb-smartfarm" },
+          "rawSql": "SELECT $__timeGroupAlias(time,'5m'), avg(temperature) AS \"Temperature\" FROM sensor_data WHERE $__timeFilter(time) GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#F59E0B" },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "unit": "celsius",
+          "min": 10,
+          "max": 45,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "green", "value": 15 },
+              { "color": "orange", "value": 30 },
+              { "color": "red", "value": 38 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Humidity (%)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "timescaledb-smartfarm" },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "timescaledb-smartfarm" },
+          "rawSql": "SELECT $__timeGroupAlias(time,'5m'), avg(humidity) AS \"Humidity\" FROM sensor_data WHERE $__timeFilter(time) GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#38BDF8" },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 30 },
+              { "color": "green", "value": 50 },
+              { "color": "blue", "value": 80 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Soil Moisture (%)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "postgres", "uid": "timescaledb-smartfarm" },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "timescaledb-smartfarm" },
+          "rawSql": "SELECT $__timeGroupAlias(time,'5m'), avg(soil_moisture) AS \"Soil Moisture\" FROM sensor_data WHERE $__timeFilter(time) GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#22C55E" },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 25 },
+              { "color": "green", "value": 45 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Water Detection Events",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "postgres", "uid": "timescaledb-smartfarm" },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "timescaledb-smartfarm" },
+          "rawSql": "SELECT $__timeGroupAlias(time,'1h'), count(*) FILTER (WHERE water_detected = true) AS \"Water Events\" FROM sensor_data WHERE $__timeFilter(time) GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#6366F1" },
+          "custom": {
+            "lineWidth": 0,
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "drawStyle": "bars",
+            "barAlignment": 0,
+            "spanNulls": false
+          },
+          "unit": "short",
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "blue", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }
+      }
+    }
+  ]
+}

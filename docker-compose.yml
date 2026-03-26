@@ -9,9 +9,15 @@ services:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin # Change this to a secure password
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      # Allow iframes to embed Grafana panels in the frontend
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      # Anonymous read-only access so the /sensors page can load panels without login
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
 
 volumes:
   grafana_data:
