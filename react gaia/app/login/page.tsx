@@ -2,7 +2,10 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
+
+const API_URL = "http://localhost:5432"
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(false)
@@ -13,17 +16,42 @@ export default function LoginPage() {
     username: "",
     password: "",
   })
+  const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-    
-    // Here you would typically make an API call
-    // For now, we'll just show a demo message
-    if (isLogin) {
-      alert(`Welcome back, ${formData.username}!`)
-    } else {
-      alert(`Account created for ${formData.username}!`)
+
+    const body: Record<string, string> = {
+      username: formData.username,
+      password: formData.password,
+    }
+
+    if (!isLogin) {
+      body.firstname = formData.firstname
+      body.lastname = formData.lastname
+    }
+
+    try {
+      const endpoint = isLogin ? "/login" : "/register"
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.message || "Request failed")
+        return
+      }
+
+      localStorage.setItem("token", data.token)
+      localStorage.setItem("currentUser", JSON.stringify(data.user))
+      router.push("/")
+    } catch {
+      setError("Cannot connect to server")
     }
   }
 
