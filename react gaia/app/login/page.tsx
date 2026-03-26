@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 
-const API_URL = "http://localhost:5432"
+const API_URL = "http://172.20.10.6:5500"
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(false)
@@ -49,7 +49,7 @@ export default function LoginPage() {
 
       localStorage.setItem("token", data.token)
       localStorage.setItem("currentUser", JSON.stringify(data.user))
-      router.push("/")
+      router.push("/profile")
     } catch {
       setError("Cannot connect to server")
     }
