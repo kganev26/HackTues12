@@ -1,0 +1,76 @@
+/* RESET - Важно за премахване на белите полета по подразбиране */
+* {
+  box-sizing: border-box;
+}
+
+body, html, .App {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden; /* Предотвратява хоризонтален скрол */
+  font-family: 'Segoe UI', sans-serif;
+  scroll-behavior: smooth;
+}
+
+/* HERO / BANNER - Вече заема целия екран */
+.hero {
+  background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+              url("https://images.pexels.com/photos/4794708/pexels-photo-4794708.jpeg?auto=compress&cs=tinysrgb&w=1920") 
+              center center/cover no-repeat;
+  width: 100vw; /* 100% от ширината на прозореца */
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+}
+
+/* FEATURES - Премахваме ограничението за ширина */
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around; /* Разпределя ги по-широко */
+  gap: 20px;
+  padding: 4rem 5%; /* 5% отстрани за леко дишане, но без големи черни дупки */
+  background: #f7f7f7;
+  width: 100%;
+}
+
+.feature {
+  flex: 1 1 300px; /* Позволява на картите да растат */
+  max-width: none; /* Премахваме ограничението от 22rem */
+  text-align: center;
+  padding: 20px;
+}
+
+/* ABOUT & CTA - Разпънати на 100% */
+.about, .cta {
+  width: 100%;
+  padding: 4rem 10%;
+  margin: 0;
+}
+
+.cta {
+  background: #56a14a;
+  color: #fff;
+  text-align: center;
+}
+
+/* FOOTER - Разпънат */
+footer {
+  width: 100%;
+  background: #333;
+  color: #fff;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.btn-primary, .btn-secondary {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+}
