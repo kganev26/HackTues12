@@ -15,7 +15,7 @@ export function Footer() {
           {/* Social links */}
           <div className="flex items-center gap-4">
             <Link
-              href="https://github.com/IT-8-TUES/8A-24-25-Team2"
+              href="https://github.com/kganev26/HackTues12"
               target="_blank"
               className="text-white/40 hover:text-white transition-colors"
               aria-label="GitHub"
