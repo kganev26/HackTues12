@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, LogOut, User } from "lucide-react"
 
-const API_URL = "http://172.20.10.6:5500"
+const API_URL = "/api"
 
 interface CurrentUser {
   id: number

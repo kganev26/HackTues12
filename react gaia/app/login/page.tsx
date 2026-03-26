@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 
-const API_URL = "http://172.20.10.6:5500"
+const API_URL = "/api"
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(false)
