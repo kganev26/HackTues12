@@ -91,7 +91,7 @@ def receive_data():
         dht_t = data.get('dht_temp')
         dht_h = data.get('dht_hum')
         water = data.get('water_detected', False)
-        mac_addr = data.get('mac_addr')
+        mac_addr = data.get('mac_address')
 
         if not mac_addr or dht_t is None or dht_h is None:
             return jsonify({'error': 'Missing data'}), 400
