@@ -13,7 +13,7 @@ import math
 
 
 DB_CONFIG = {
-    "host": "10.35.212.104",
+    "host": "10.210.46.104",
     "database": "smartfarm",
     "user": "farm_admin",
     "password": "hackathon_password",
@@ -33,7 +33,7 @@ def ensure_columns(cur):
 
 
 def generate_records():
-    end_time = datetime.now()
+    end_time = datetime.utcnow()
     start_time = end_time - timedelta(days=DAYS_BACK)
 
     records = []
