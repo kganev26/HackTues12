@@ -1,0 +1,213 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    width: 100%;
+    overflow-x: hidden;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f7f4;
+}
+
+/* HERO SECTION - МНОГО ПО-ГОЛЯМА И С НОВА СНИМКА */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* Заема целия екран */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    /* Нова снимка: Мащабна и зелена */
+    background: url("https://assets.fcsamerica.com/transform/15a72fc9-c731-4716-ac1a-cd7916268d04/land-for-sale-how-to-find-farmland") 
+                center center/cover no-repeat fixed; /* fixed създава лек паралакс ефект */
+}
+
+.background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55); /* Затъмнение за четливост */
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 20px;
+}
+
+.hero-title {
+    font-size: 6rem; /* Много голям размер */
+    font-weight: 900;
+    color: #ffb300;
+    letter-spacing: 10px;
+    margin-bottom: 10px;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.title-underline {
+    width: 100px;
+    height: 5px;
+    background-color: #ffb300;
+    margin: 0 auto 30px;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+    font-weight: 300;
+    color: #f0f0f0;
+}
+
+.btn-primary-large {
+    padding: 18px 45px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px rgba(46, 125, 50, 0.4);
+}
+
+.btn-primary-large:hover {
+    background: #1b5e20;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(46, 125, 50, 0.5);
+}
+
+/* FEATURES SECTION - Остава в същия стил, но леко коригиран марджин */
+.features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    padding: 100px 5%;
+    margin-top: -120px; /* По-голямо застъпване за по-динамичен вид */
+    position: relative;
+    z-index: 10;
+}
+
+.feature-card {
+    background: white;
+    flex: 1 1 300px;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover { transform: translateY(-10px); }
+
+.card-text {
+    padding: 40px 30px;
+    min-height: 220px;
+}
+
+.card-text h3 { font-size: 1.6rem; margin-bottom: 15px; color: #222; font-weight: 700; }
+.card-text p { color: #777; line-height: 1.7; }
+
+.card-image-wrapper { position: relative; width: 100%; height: 240px; }
+.card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+.action-button {
+    position: absolute;
+    top: -25px;
+    left: 25px;
+    background-color: #78a15d;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid white;
+}
+
+/* ABOUT */
+.about { padding: 120px 15%; text-align: center; background: white; }
+.about h2 { font-size: 3rem; color: #2e7d32; margin-bottom: 25px; }
+.about p { font-size: 1.3rem; color: #555; line-height: 1.8; max-width: 900px; margin: 0 auto; }
+
+/* FOOTER */
+footer { background: #111; padding: 40px 0; color: white; width: 100%; }
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.footer-left { display: flex; gap: 25px; }
+.footer-left a { color: #fff; font-size: 1.5rem; transition: 0.3s; }
+.footer-left a:hover { color: #ffb300; }
+.copyright { font-size: 1rem; color: #eee; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-title { font-size: 3.5rem; letter-spacing: 5px; }
+    .hero-subtitle { font-size: 1.1rem; }
+    .footer-container { flex-direction: column; gap: 20px; text-align: center; }
+}
+
+
+.foot{
+    border-top: 1px solid white;
+    display: flex;
+    background: black;
+    max-width: 100%;
+    height: 18rem;
+    padding: 3rem 5rem 2rem 5rem;
+    flex: 0 0 auto;
+    justify-content: space-between;
+}
+
+.foot p{
+    color: white;
+    
+}
+
+.logofoot{
+    font-family: 'Matrix', monospace;
+    color: white;
+    font-size: 5rem;
+}
+
+.other{
+    font-size: 1.4rem;
+}
+
+.other a{
+    color: white;
+    text-decoration: none;
+    position: relative;
+}
+
+.other a::after{
+    content:"";
+    position: absolute;
+    height: 1px;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    background: white;
+    transition: width 0.2s;
+}
+
+.other a:hover:after{
+    width: 100%;
+}
