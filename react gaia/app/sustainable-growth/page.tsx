@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Leaf, Droplets, Recycle, Factory, ArrowLeft, CheckCircle } from "lucide-react"
+import { Footer } from "@/components/footer"
 
 export default function SustainableGrowthPage() {
   return (
@@ -161,19 +162,7 @@ export default function SustainableGrowthPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 px-6 text-center bg-emerald-700">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to grow sustainably?</h2>
-        <p className="text-emerald-100 text-lg mb-8">
-          Join Gaia and let your farm benefit from clean, recycled water powered by AI.
-        </p>
-        <Link
-          href="/login"
-          className="inline-block bg-white text-emerald-800 font-semibold px-8 py-3 rounded-lg hover:bg-emerald-50 transition-colors shadow-lg"
-        >
-          Get Started
-        </Link>
-      </section>
+      <Footer />
     </main>
   )
 }
