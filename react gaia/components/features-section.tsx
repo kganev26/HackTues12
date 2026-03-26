@@ -1,5 +1,6 @@
 import { ChevronRight, Cpu, Leaf, Droplets } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 const features = [
   {
@@ -7,18 +8,21 @@ const features = [
     description: "Track soil moisture, temperature, water levels, and lighting in real-time with our high-precision IoT hardware.",
     image: "https://images.pexels.com/photos/2132250/pexels-photo-2132250.jpeg?auto=compress&cs=tinysrgb&w=600",
     icon: Droplets,
+    href: null,
   },
   {
     title: "AI Analysis",
     description: "Artificial Intelligence analyzes your farm data to provide actionable insights and maximize efficiency.",
     image: "https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress&cs=tinysrgb&w=600",
     icon: Cpu,
+    href: null,
   },
   {
     title: "Sustainable Growth",
     description: "Personalized advice and automation triggers to ensure your plants grow healthy and strong, using recycled water.",
     image: "https://images.pexels.com/photos/1105019/pexels-photo-1105019.jpeg?auto=compress&cs=tinysrgb&w=600",
     icon: Leaf,
+    href: "/sustainable-growth",
   },
 ]
 
@@ -37,11 +41,20 @@ export function FeaturesSection() {
             </div>
             <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
           </div>
-          
+
           <div className="relative w-full h-60">
-            <div className="absolute -top-6 left-6 z-10 w-12 h-12 rounded-full bg-green-600 text-white flex items-center justify-center border-4 border-white shadow-lg group-hover:scale-110 transition-transform">
-              <ChevronRight className="w-5 h-5" />
-            </div>
+            {feature.href ? (
+              <Link
+                href={feature.href}
+                className="absolute -top-6 left-6 z-10 w-12 h-12 rounded-full bg-green-600 text-white flex items-center justify-center border-4 border-white shadow-lg group-hover:scale-110 transition-transform"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </Link>
+            ) : (
+              <div className="absolute -top-6 left-6 z-10 w-12 h-12 rounded-full bg-green-600 text-white flex items-center justify-center border-4 border-white shadow-lg group-hover:scale-110 transition-transform">
+                <ChevronRight className="w-5 h-5" />
+              </div>
+            )}
             <Image
               src={feature.image}
               alt={feature.title}
