@@ -13,7 +13,7 @@ import math
 
 
 DB_CONFIG = {
-    "host": "172.20.10.6",
+    "host": "10.35.212.104",
     "database": "smartfarm",
     "user": "farm_admin",
     "password": "hackathon_password",
@@ -25,6 +25,8 @@ DAYS_BACK = 7
 
 
 def ensure_columns(cur):
+    # Drop NOT NULL on legacy column so old rows aren't required
+    cur.execute("ALTER TABLE sensor_data ALTER COLUMN moisture DROP NOT NULL;")
     cur.execute("ALTER TABLE sensor_data ADD COLUMN IF NOT EXISTS humidity REAL;")
     cur.execute("ALTER TABLE sensor_data ADD COLUMN IF NOT EXISTS soil_moisture REAL;")
     cur.execute("ALTER TABLE sensor_data ADD COLUMN IF NOT EXISTS water_detected BOOLEAN DEFAULT FALSE;")
