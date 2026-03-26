@@ -1,10 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+import re
 import psycopg2
 from datetime import datetime, timedelta
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
+
+MAC_REGEX = re.compile(r'^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$')
 
 app = Flask(__name__)
 CORS(app)
@@ -267,6 +270,9 @@ def update_mac():
 
     mac = request.json.get('mac_address', '').strip()
 
+    if mac and not MAC_REGEX.match(mac):
+        return jsonify({'message': 'Invalid MAC address format. Expected XX:XX:XX:XX:XX:XX'}), 400
+
     conn = get_db_connection()
     try:
         cur = conn.cursor()
@@ -283,6 +289,24 @@ def update_mac():
         conn.close()
 
     return jsonify({'mac_address': mac if mac else None}), 200
+
+
+@app.route('/user/mac', methods=['DELETE'])
+def remove_mac():
+    user_id, err_response, err_code = get_user_id_from_request()
+    if err_response:
+        return err_response, err_code
+
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute('UPDATE users SET mac_address = NULL WHERE id = %s', (user_id,))
+        conn.commit()
+    finally:
+        cur.close()
+        conn.close()
+
+    return jsonify({'message': 'MAC address removed'}), 200
 
 
 if __name__ == '__main__':
