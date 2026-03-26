@@ -123,22 +123,22 @@ export default function ProfilePage() {
             {/* Fields */}
             <div className="divide-y divide-gray-100">
               <div className="px-6 py-4 flex justify-between items-center">
-                <span className="text-xs uppercase tracking-widest text-gray-400 font-medium">Username</span>
+                <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">Username</span>
                 <span className="text-gray-900 font-semibold">@{user.username}</span>
               </div>
               <div className="px-6 py-4 flex justify-between items-center">
-                <span className="text-xs uppercase tracking-widest text-gray-400 font-medium">First Name</span>
+                <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">First Name</span>
                 <span className="text-gray-900 font-semibold">{user.firstname}</span>
               </div>
               <div className="px-6 py-4 flex justify-between items-center">
-                <span className="text-xs uppercase tracking-widest text-gray-400 font-medium">Last Name</span>
+                <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">Last Name</span>
                 <span className="text-gray-900 font-semibold">{user.lastname}</span>
               </div>
 
               {/* MAC Address row */}
               <div className="px-6 py-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs uppercase tracking-widest text-gray-400 font-medium">MAC Address</span>
+                  <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">MAC Address</span>
                   {!macEditing && (
                     <div className="flex items-center gap-3">
                       {user.mac_address ? (
@@ -199,7 +199,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Footer note */}
-      <div className="px-8 pb-8 text-center text-gray-300 text-xs">
+      <div className="px-8 pb-8 text-center text-gray-500 text-xs">
         Powered by Grafana · TimescaleDB · GAIA Smart Farm
       </div>
     </main>

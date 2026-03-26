@@ -8,7 +8,7 @@ import { ArrowLeft } from "lucide-react"
 const API_URL = "/api"
 
 export default function LoginPage() {
-  const [isLogin, setIsLogin] = useState(false)
+  const [isLogin, setIsLogin] = useState(true)
   const [error, setError] = useState("")
   const [formData, setFormData] = useState({
     firstname: "",
