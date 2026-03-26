@@ -31,21 +31,13 @@ def get_db_connection():
         password='hackathon_password'
     )
 
-# 2. Automatically set up the tables if they don't exist
+# Fix #1: users table created first so sensor_data FK reference is valid
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
-    
-    # Create the standard table
+
     cur.execute('''
-        CREATE TABLE IF NOT EXISTS sensor_data (
-            time TIMESTAMP NOT NULL,
-            temperature REAL NOT NULL,
-            moisture REAL NOT NULL
-        );
-    ''')
-    cur.execute('''
-            CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
             username VARCHAR(50) UNIQUE NOT NULL,
             firstname VARCHAR(50) NOT NULL,
@@ -53,88 +45,113 @@ def init_db():
             password_hash VARCHAR(255) NOT NULL,
             mac_address VARCHAR(17) UNIQUE
         );
-
-''')
+    ''')
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS sensor_data (
+            time TIMESTAMP NOT NULL,
+            temperature REAL NOT NULL,
+            moisture REAL NOT NULL,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
+        );
+    ''')
     # Turn it into a high-speed TimescaleDB hypertable
     cur.execute("SELECT create_hypertable('sensor_data', 'time', if_not_exists => TRUE);")
-    
+
     conn.commit()
     cur.close()
     conn.close()
 
 init_db()
 
-# Същият маршрут, към който NodeMCU изпраща данните
-@app.route('/recive', methods=['POST'])
+def decode_jwt_token(token):
+    return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+
+# Fix #5: corrected route typo /recive -> /receive
+@app.route('/receive', methods=['POST'])
 def receive_data():
     try:
-        # Взимаме JSON пакета от заявката
         data = request.get_json()
-        
+
         if not data:
             return jsonify({"status": "error", "message": "No JSON payload provided"}), 400
 
-        # Извличаме конкретните стойности (само DHT и вода)
-        dht_t = data.get('dht_temp', 'N/A')
-        dht_h = data.get('dht_hum', 'N/A')
+        dht_t = data.get('dht_temp')
+        dht_h = data.get('dht_hum')
         water = data.get('water_detected', False)
-        #mac_addr = data.get('mac_addr', 'N/A')
-            
-        #if not mac_addr or dht_t is None or dht_h is None:
-        #    return jsonify({'error': 'Missing data'}), 400
+        # Fix #2: default None so missing MAC is caught correctly
+        mac_addr = data.get('mac_addr')
 
-        # Save to database
+        if not mac_addr or dht_t is None or dht_h is None:
+            return jsonify({'error': 'Missing data'}), 400
+
+        # Fix #3: use try/finally so connection always closes
         conn = get_db_connection()
-        cur = conn.cursor()
-        
-        # 1. Lookup who owns this MAC address
-        #cur.execute('SELECT id FROM users WHERE mac_address = %s;', (mac_addr,))
-        #user = cur.fetchone()
-        
-        cur.execute('INSERT INTO sensor_data (time, temperature, moisture) VALUES (%s, %s, %s)',
-                (datetime.now(), dht_t, dht_h))
-        conn.commit()
-        cur.close()
-        conn.close()
+        try:
+            cur = conn.cursor()
 
-        
-        # Връщаме успешен отговор към NodeMCU
+            cur.execute('SELECT id FROM users WHERE mac_address = %s;', (mac_addr,))
+            user = cur.fetchone()
+
+            if not user:
+                # ESP will read this '5' and sleep 5x longer than usual!
+                return jsonify({'error': 'Device not registered', 'sleep_multiplier': 5}), 401
+
+            user_id = user[0]
+
+            cur.execute('INSERT INTO sensor_data (time, temperature, moisture, user_id) VALUES (%s, %s, %s, %s)',
+                    (datetime.now(), dht_t, dht_h, user_id))
+            conn.commit()
+        finally:
+            cur.close()
+            conn.close()
+
         return jsonify({"status": "success", "message": "Data received and parsed!"}), 200
 
     except Exception as e:
         print(f"Грешка при обработката: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# 4. The API Endpoint to READ the data (For your Dashboard or AI)
+# Fix #4: /display now requires a valid JWT and only returns that user's data
 @app.route('/display', methods=['GET'])
 def get_history():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    # Query Postgres: Get the 15 most recent readings, newest first
-    cur.execute('''
-        SELECT time, temperature, moisture 
-        FROM sensor_data 
-        ORDER BY time DESC 
-        LIMIT 15;
-    ''')
-    
-    rows = cur.fetchall()
-    
-    cur.close()
-    conn.close()
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Bearer '):
+        return jsonify({'message': 'Missing or invalid token'}), 401
 
-    # Format the raw database rows into a clean JSON list
+    try:
+        payload = decode_jwt_token(auth_header.split(' ', 1)[1])
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token expired'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token'}), 401
+
+    user_id = payload['user_id']
+
+    # Fix #3: use try/finally so connection always closes
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT time, temperature, moisture
+            FROM sensor_data
+            WHERE user_id = %s
+            ORDER BY time DESC
+            LIMIT 15;
+        ''', (user_id,))
+        rows = cur.fetchall()
+    finally:
+        cur.close()
+        conn.close()
+
     data_list = []
     for row in rows:
         data_list.append({
-            'time': row[0].strftime('%H:%M:%S'), # Just grabbing the hour/min/sec for a clean chart
+            'time': row[0].strftime('%H:%M:%S'),
             'temp': row[1],
             'moisture': row[2]
         })
 
-    # Since we ordered DESC (newest first) to get the latest, 
-    # we should reverse it so the oldest is on the left of our UI chart
+    # Reverse so oldest is on the left of the UI chart
     data_list.reverse()
 
     return jsonify(data_list), 200
@@ -158,10 +175,10 @@ def register_user():
     # 3. Save it to the database
     conn = get_db_connection()
     cur = conn.cursor()
-    
+
     try:
         cur.execute('''
-            INSERT INTO users (username, firstname, lastname, password_hash) 
+            INSERT INTO users (username, firstname, lastname, password_hash)
             VALUES (%s, %s, %s, %s) RETURNING id;
         ''', (username, firstname, lastname, hashed_password))
 
@@ -183,7 +200,7 @@ def register_user():
         # This catches if someone tries to use a username that already exists
         conn.rollback()
         return jsonify({'message': 'Username already taken.'}), 409
-        
+
     finally:
         cur.close()
         conn.close()
@@ -232,4 +249,3 @@ if __name__ == '__main__':
     # Стартираме сървъра на порт 5500 и слушаме от всички IP-та (0.0.0.0)
     print("🚀 Flask сървърът стартира! Чакам данни от NodeMCU на порт 5500...")
     app.run(host='0.0.0.0', port=5500, debug=True)
-
