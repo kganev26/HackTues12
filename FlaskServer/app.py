@@ -50,7 +50,8 @@ def init_db():
             username VARCHAR(50) UNIQUE NOT NULL,
             firstname VARCHAR(50) NOT NULL,
             lastname VARCHAR(50) NOT NULL,
-            password_hash VARCHAR(255) NOT NULL
+            password_hash VARCHAR(255) NOT NULL,
+            mac_address VARCHAR(17) UNIQUE
         );
 
 ''')
@@ -64,7 +65,7 @@ def init_db():
 init_db()
 
 # Същият маршрут, към който NodeMCU изпраща данните
-@app.route('/cardnum', methods=['POST'])
+@app.route('/recive', methods=['POST'])
 def receive_data():
     try:
         # Взимаме JSON пакета от заявката
@@ -77,29 +78,26 @@ def receive_data():
         dht_t = data.get('dht_temp', 'N/A')
         dht_h = data.get('dht_hum', 'N/A')
         water = data.get('water_detected', False)
+        #mac_addr = data.get('mac_addr', 'N/A')
             
-        # Принтираме ги красиво в конзолата на сървъра
-        print("\n" + "="*40)
-        print("🌍 НОВИ МЕТЕОРОЛОГИЧНИ ДАННИ ПОЛУЧЕНИ 🌍")
-        print("="*40)
-        print(f"🌡️  Температура:     {dht_t} °C")
-        print(f"💧  Влажност:        {dht_h} %")
-        print(f"⚠️  Сензор за вода:  {'ЗАСЕЧЕНА ВОДА!' if water else 'Сухо'}")
-        print("="*40 + "\n")
+        #if not mac_addr or dht_t is None or dht_h is None:
+        #    return jsonify({'error': 'Missing data'}), 400
 
         # Save to database
         conn = get_db_connection()
         cur = conn.cursor()
+        
+        # 1. Lookup who owns this MAC address
+        #cur.execute('SELECT id FROM users WHERE mac_address = %s;', (mac_addr,))
+        #user = cur.fetchone()
+        
         cur.execute('INSERT INTO sensor_data (time, temperature, moisture) VALUES (%s, %s, %s)',
                 (datetime.now(), dht_t, dht_h))
         conn.commit()
         cur.close()
         conn.close()
 
-        # Hackathon Alert Logic!
-        if dht_h < 20:
-            print(f"🚨 AI ALERT: Soil moisture critically low at {dht_h}%! Triggering water system...")
-
+        
         # Връщаме успешен отговор към NodeMCU
         return jsonify({"status": "success", "message": "Data received and parsed!"}), 200
 
@@ -152,7 +150,7 @@ def register_user():
 
     # 1. Basic check to make sure they didn't leave things blank
     if not username or not password or not firstname or not lastname:
-        return jsonify({'error': 'Username and password are required!'}), 400
+        return jsonify({'message': 'Username and password are required!'}), 400
 
     # 2. THE SECURITY MAGIC: Hash the password
     hashed_password = generate_password_hash(password)
