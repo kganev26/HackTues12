@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 
 const GRAFANA_BASE = "http://localhost:3000"
 const DASHBOARD_UID = "gaia-sensors"
