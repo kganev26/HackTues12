@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import psycopg2
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+CORS(app)
 
 def get_db_connection():
     return psycopg2.connect(
@@ -145,18 +147,20 @@ def register_user():
     
     try:
         cur.execute('''
-            INSERT INTO users (username, firstname, lastname, password_hash,) 
-            VALUES (%s, %s, %s, %s, %s) RETURNING id;
+            INSERT INTO users (username, firstname, lastname, password_hash) 
+            VALUES (%s, %s, %s, %s) RETURNING id;
         ''', (username, firstname, lastname, hashed_password))
         
         new_user_id = cur.fetchone()[0] # Grab the new ID so the frontend knows who they are
         conn.commit()
+        print("Successfuly added new user")
         return jsonify({'status': 'success', 'user_id': new_user_id, 'message': 'Farmer registered!'}), 201
+    
         
     except psycopg2.errors.UniqueViolation:
         # This catches if someone tries to use a username that already exists
         conn.rollback()
-        return jsonify({'error': 'Username already taken.'}), 409
+        return jsonify({'message': 'Username already taken.'}), 409
         
     finally:
         cur.close()

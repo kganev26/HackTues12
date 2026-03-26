@@ -1,4 +1,4 @@
-const API_URL = "https://192.168.88.8:5500";
+const API_URL = "http://localhost:5500";
 let isLogin = false;
 
 // Елементи от DOM-а
