@@ -4,8 +4,7 @@ datasources:
   - name: TimescaleDB
     type: postgres
     uid: timescaledb-smartfarm
-    # On Windows Docker Desktop, host.docker.internal resolves to the host machine
-    url: host.docker.internal:5432
+    url: 10.35.212.104:5432
     database: smartfarm
     user: farm_admin
     secureJsonData:

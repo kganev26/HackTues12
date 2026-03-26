@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const FLASK_URL = process.env.FLASK_URL || "http://localhost:5500"
+const FLASK_URL = process.env.FLASK_URL || "http://10.35.212.104:5500"
 
 const nextConfig = {
   typescript: {

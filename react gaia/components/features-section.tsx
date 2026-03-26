@@ -10,7 +10,7 @@ const features = [
     description: "Track soil moisture, temperature, water levels, and lighting in real-time with our high-precision IoT hardware.",
     image: "https://images.pexels.com/photos/2132250/pexels-photo-2132250.jpeg?auto=compress&cs=tinysrgb&w=600",
     icon: Droplets,
-    href: null,
+    href: "/sensors",
   },
   {
     title: "AI Analysis",

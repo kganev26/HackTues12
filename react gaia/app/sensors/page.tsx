@@ -1,23 +1,87 @@
 "use client"
 
+import { useState } from "react"
+
 const GRAFANA_BASE = "http://localhost:3000"
 const DASHBOARD_UID = "gaia-sensors"
-const TIME_RANGE = "from=now-7d&to=now"
-const REFRESH = "refresh=30s"
-const THEME = "theme=dark"
+const DASHBOARD_SLUG = "gaia-sensor-dashboard"
 
-function panelUrl(panelId: number) {
-  return `${GRAFANA_BASE}/d-solo/${DASHBOARD_UID}/gaia-sensor-dashboard?orgId=1&panelId=${panelId}&${TIME_RANGE}&${REFRESH}&${THEME}`
-}
+const TIME_RANGES = [
+  { label: "1 h",  value: "now-1h" },
+  { label: "6 h",  value: "now-6h" },
+  { label: "24 h", value: "now-24h" },
+  { label: "7 d",  value: "now-7d" },
+  { label: "30 d", value: "now-30d" },
+]
+
+const REFRESH_RATES = [
+  { label: "Off",  value: "" },
+  { label: "10 s", value: "10s" },
+  { label: "30 s", value: "30s" },
+  { label: "1 m",  value: "1m" },
+  { label: "5 m",  value: "5m" },
+]
 
 const panels = [
-  { id: 1, label: "Temperature", icon: "🌡️" },
-  { id: 2, label: "Humidity",    icon: "💧" },
+  { id: 1, label: "Temperature",  icon: "🌡️" },
+  { id: 2, label: "Humidity",      icon: "💧" },
   { id: 3, label: "Soil Moisture", icon: "🌱" },
   { id: 4, label: "Water Events",  icon: "🚿" },
 ]
 
+function SelectGroup({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string
+  options: { label: string; value: string }[]
+  value: string
+  onChange: (v: string) => void
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-white/40 text-xs uppercase tracking-widest">{label}</span>
+      <div className="flex rounded-lg overflow-hidden border border-white/10">
+        {options.map((opt) => (
+          <button
+            key={opt.value}
+            onClick={() => onChange(opt.value)}
+            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              value === opt.value
+                ? "bg-amber-400 text-black"
+                : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function SensorsPage() {
+  const [from, setFrom] = useState("now-7d")
+  const [refresh, setRefresh] = useState("30s")
+
+  function panelUrl(panelId: number) {
+    const params = new URLSearchParams({
+      orgId: "1",
+      from,
+      to: "now",
+      timezone: "browser",
+      __feature_dashboardScene: "true",
+      panelId: `panel-${panelId}`,
+    })
+    if (refresh) params.set("refresh", refresh)
+    // __feature.dashboardScene uses a dot which URLSearchParams encodes — set it raw
+    return `${GRAFANA_BASE}/d-solo/${DASHBOARD_UID}/${DASHBOARD_SLUG}?${params.toString().replace("__feature_dashboardScene", "__feature.dashboardScene")}`
+  }
+
+  const selectedRange = TIME_RANGES.find((r) => r.value === from)?.label ?? ""
+
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Header */}
@@ -29,12 +93,31 @@ export default function SensorsPage() {
         </span>
       </div>
 
-      {/* Description */}
-      <div className="px-8 py-6">
-        <h1 className="text-2xl font-bold text-white mb-1">Live Sensor Data</h1>
-        <p className="text-white/50 text-sm">
-          Real-time readings from field sensors — last 7 days, refreshed every 30 s.
-        </p>
+      {/* Title + controls */}
+      <div className="px-8 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white mb-1">Live Sensor Data</h1>
+          <p className="text-white/50 text-sm">
+            Showing the last {selectedRange}
+            {refresh ? ` · auto-refresh every ${refresh}` : " · auto-refresh off"}.
+          </p>
+        </div>
+
+        {/* Settings controls */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <SelectGroup
+            label="Range"
+            options={TIME_RANGES}
+            value={from}
+            onChange={setFrom}
+          />
+          <SelectGroup
+            label="Refresh"
+            options={REFRESH_RATES}
+            value={refresh}
+            onChange={setRefresh}
+          />
+        </div>
       </div>
 
       {/* 2×2 panel grid */}
@@ -49,10 +132,11 @@ export default function SensorsPage() {
               <span className="text-sm font-semibold text-white/80">{panel.label}</span>
             </div>
             <iframe
+              key={`${panel.id}-${from}-${refresh}`}
               src={panelUrl(panel.id)}
               width="100%"
               height="260"
-              frameBorder="0"
+              style={{ border: "none" }}
               title={panel.label}
               className="block"
             />
@@ -60,7 +144,6 @@ export default function SensorsPage() {
         ))}
       </div>
 
-      {/* Footer note */}
       <div className="px-8 pb-8 text-center text-white/25 text-xs">
         Powered by Grafana · TimescaleDB · GAIA Smart Farm
       </div>
