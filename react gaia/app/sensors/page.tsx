@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 
 const GRAFANA_BASE = "http://localhost:3000"
@@ -66,6 +66,15 @@ function SelectGroup({
 export default function SensorsPage() {
   const [from, setFrom] = useState("now-7d")
   const [refresh, setRefresh] = useState("30s")
+  const [userId, setUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const stored = localStorage.getItem("currentUser")
+    if (stored) {
+      const user = JSON.parse(stored)
+      setUserId(String(user.id))
+    }
+  }, [])
 
   function panelUrl(panelId: number) {
     const params = new URLSearchParams({
@@ -77,6 +86,7 @@ export default function SensorsPage() {
       panelId: `panel-${panelId}`,
     })
     if (refresh) params.set("refresh", refresh)
+    if (userId) params.set("var-user_id", userId)
     // __feature.dashboardScene uses a dot which URLSearchParams encodes — set it raw
     return `${GRAFANA_BASE}/d-solo/${DASHBOARD_UID}/${DASHBOARD_SLUG}?${params.toString().replace("__feature_dashboardScene", "__feature.dashboardScene")}`
   }
