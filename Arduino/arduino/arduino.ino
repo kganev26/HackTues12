@@ -11,9 +11,9 @@
 #define SOIL_PIN A0    // <-- Новият пин за почвата (New soil pin)
 
 // --- WiFi и Сървър настройки ---  
-const char* ssid = "Daniel's S24";
-const char* password = "BatManSavage1976";
-const char* serverURL = "http://10.35.212.104:5500/receive";
+const char* ssid = "bob";
+const char* password = "12345678";
+const char* serverURL = "http://10.210.46.104:5500/receive";
 
 // --- Инициализация на сензорите ---
 DHT dht(DHTPIN, DHTTYPE);
@@ -48,7 +48,7 @@ void setup() {
 
 void loop() {
   // Даваме време на DHT11 да се подготви
-  delay(2000); 
+  delay(20000); 
 
   // --- Четене на сензорите ---
   float dhtTemp = dht.readTemperature();
@@ -94,11 +94,7 @@ void loop() {
   // Изчакваме 3 секунди преди изпращане
   delay(3000); 
   
-  if(sendDataToServer(jsonPayload)){
-    Serial.println("[Система] Заспиване (Deep Sleep) за 30 секунди...");
-    // ВНИМАНИЕ: D0 трябва да е свързан към RST за да се събуди!
-    ESP.deepSleep(300000); // 30 секунди в микросекунди (30,000,000)
-  }
+  sendDataToServer(jsonPayload);
 }
 
 // --- Функция за изпращане на данните ---
