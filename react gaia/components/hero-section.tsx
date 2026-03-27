@@ -1,9 +1,16 @@
 "use client"
 
-import { ArrowRight } from "lucide-react"
+import { useEffect, useState } from "react"
+import { ArrowRight, User } from "lucide-react"
 import Link from "next/link"
 
 export function HeroSection() {
+  const [loggedIn, setLoggedIn] = useState(false)
+
+  useEffect(() => {
+    setLoggedIn(!!localStorage.getItem("currentUser"))
+  }, [])
+
   return (
     <section className="relative w-full h-screen flex items-center justify-center text-center text-white overflow-hidden">
       {/* Background Image */}
@@ -42,13 +49,23 @@ export function HeroSection() {
           className="animate-fade-up"
           style={{ animationDelay: '500ms' }}
         >
-          <Link
-            href="/chat"
-            className="inline-flex items-center gap-2 px-10 py-4 bg-green-700 hover:bg-green-800 text-white rounded-full font-bold text-lg transition-all duration-300 shadow-lg shadow-green-700/40 hover:-translate-y-1 hover:scale-105 hover:shadow-xl hover:shadow-green-700/50"
-          >
-            Get Started
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+          {loggedIn ? (
+            <Link
+              href="/profile"
+              className="inline-flex items-center gap-2 px-10 py-4 bg-green-700 hover:bg-green-800 text-white rounded-full font-bold text-lg transition-all duration-300 shadow-lg shadow-green-700/40 hover:-translate-y-1 hover:scale-105 hover:shadow-xl hover:shadow-green-700/50"
+            >
+              View Profile
+              <User className="w-5 h-5" />
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 px-10 py-4 bg-green-700 hover:bg-green-800 text-white rounded-full font-bold text-lg transition-all duration-300 shadow-lg shadow-green-700/40 hover:-translate-y-1 hover:scale-105 hover:shadow-xl hover:shadow-green-700/50"
+            >
+              Get Started
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          )}
         </div>
       </div>
     </section>
