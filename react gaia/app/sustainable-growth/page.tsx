@@ -1,27 +1,14 @@
 'use client'
 
 import Link from "next/link"
-import { Leaf, Droplets, Recycle, Factory, ArrowLeft, CheckCircle, FlaskConical, Truck } from "lucide-react"
+import { Leaf, Droplets, Factory, ArrowLeft, CheckCircle } from "lucide-react"
 import { Footer } from "@/components/footer"
 import { useLanguage } from "@/lib/language-context"
 import type { TranslationKey } from "@/lib/translations"
 
-const stepKeys = [
-  { icon: Factory, titleKey: "sg_step1_title" as TranslationKey, bodyKey: "sg_step1_body" as TranslationKey },
-  { icon: FlaskConical, titleKey: "sg_step2_title" as TranslationKey, bodyKey: "sg_step2_body" as TranslationKey },
-  { icon: Recycle, titleKey: "sg_step3_title" as TranslationKey, bodyKey: "sg_step3_body" as TranslationKey },
-  { icon: Truck, titleKey: "sg_step4_title" as TranslationKey, bodyKey: "sg_step4_body" as TranslationKey },
-]
-
 const benefitKeys: TranslationKey[] = [
   "sg_benefit_1", "sg_benefit_2", "sg_benefit_3",
-  "sg_benefit_4", "sg_benefit_5", "sg_benefit_6",
-]
-
-const statKeys: { value: string; labelKey: TranslationKey }[] = [
-  { value: "4-stage", labelKey: "sg_stat_filtration" },
-  { value: "100%", labelKey: "sg_stat_certified" },
-  { value: "0 waste", labelKey: "sg_stat_waste" },
+  "sg_benefit_6",
 ]
 
 export default function SustainableGrowthPage() {
@@ -56,15 +43,6 @@ export default function SustainableGrowthPage() {
           </p>
         </div>
 
-        {/* Stats strip */}
-        <div className="relative max-w-2xl mx-auto mt-14 grid grid-cols-3 divide-x divide-white/10 animate-fade-up" style={{ animationDelay: '520ms' }}>
-          {statKeys.map((s) => (
-            <div key={s.labelKey} className="text-center px-6 py-4">
-              <div className="text-2xl font-bold text-emerald-400 mb-1">{s.value}</div>
-              <div className="text-white/40 text-xs uppercase tracking-widest">{t(s.labelKey)}</div>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* The Problem */}
@@ -86,47 +64,6 @@ export default function SustainableGrowthPage() {
             <p className="text-lg text-stone-600 dark:text-stone-400 leading-relaxed animate-fade-in" style={{ animationDelay: '200ms' }}>
               {t("sg_problem_p2")}
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Filtration Pipeline */}
-      <section className="py-20 px-6 md:px-12">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-3 mb-12 animate-fade-up" style={{ animationDelay: '0ms' }}>
-            <span className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
-              <Recycle className="w-5 h-5" />
-            </span>
-            <h2 className="text-2xl md:text-3xl font-bold text-stone-900 dark:text-white">
-              {t("sg_pipeline_title")}
-            </h2>
-          </div>
-
-          <div className="relative">
-            <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-emerald-400 via-emerald-300 to-transparent" />
-
-            <div className="space-y-10">
-              {stepKeys.map((step, i) => {
-                const Icon = step.icon
-                return (
-                  <div key={i} className="relative flex gap-8 animate-fade-up" style={{ animationDelay: `${80 + i * 120}ms` }}>
-                    <div className="relative z-10 w-11 h-11 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-600/30 border-4 border-stone-50 dark:border-gray-950">
-                      <Icon className="w-4 h-4" />
-                    </div>
-
-                    <div className="flex-1 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-stone-100 dark:border-gray-800 p-6 mb-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
-                          {t("sg_step")} {i + 1}
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-semibold text-stone-900 dark:text-white mb-2">{t(step.titleKey)}</h3>
-                      <p className="text-stone-600 dark:text-stone-400 leading-relaxed text-sm">{t(step.bodyKey)}</p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
           </div>
         </div>
       </section>
