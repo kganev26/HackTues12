@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { ArrowLeft, Cpu, Droplets, Leaf, Settings, Users, Globe, Sprout } from "lucide-react"
+import { Cpu, Droplets, Leaf, Settings, Users, Globe, Sprout } from "lucide-react"
 import { Footer } from "@/components/footer"
 import { useLanguage } from "@/lib/language-context"
 import type { TranslationKey } from "@/lib/translations"
@@ -28,37 +28,14 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-stone-50 to-stone-100 dark:from-gray-950 dark:to-gray-900 flex flex-col">
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-[#0a0f0c] px-6 pt-8 pb-24 text-center">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(16,185,129,0.12)_0%,_transparent_70%)]" />
-
-        <Link
-          href="/"
-          className="absolute top-8 left-6 inline-flex items-center gap-2 text-white/50 hover:text-white font-medium transition-colors text-sm animate-fade-in"
-          style={{ animationDelay: '0ms' }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          {t("back_to_home")}
-        </Link>
-
-        <div className="relative max-w-3xl mx-auto">
-          <div className="mb-4 animate-fade-up" style={{ animationDelay: '80ms' }}>
-            <span className="inline-block text-emerald-400 text-sm font-medium tracking-widest uppercase">
-              {t("about_label")}
-            </span>
-          </div>
-
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-up" style={{ animationDelay: '180ms' }}>
-            {t("about_heading")}
-          </h1>
-
-          <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-amber-400 mx-auto rounded-full mb-8 animate-fade-in" style={{ animationDelay: '320ms' }} />
-
-          <p className="text-white/60 text-lg leading-relaxed max-w-xl mx-auto animate-fade-in" style={{ animationDelay: '420ms' }}>
-            {t("about_page_subtitle")}
-          </p>
-        </div>
-      </section>
+      {/* Header */}
+      <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-8 py-5 flex items-center gap-4">
+        <Link href="/" className="text-3xl font-black text-amber-500 tracking-widest hover:opacity-80 transition-opacity">GAIA</Link>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
+        <span className="text-gray-400 text-sm font-medium uppercase tracking-widest">
+          {t("about_heading")}
+        </span>
+      </div>
 
       {/* Accordion */}
       <section className="flex-1 max-w-3xl mx-auto w-full px-6 py-20">
