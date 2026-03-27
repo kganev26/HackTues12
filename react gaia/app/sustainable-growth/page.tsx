@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { Leaf, Droplets, Factory, ArrowLeft, CheckCircle } from "lucide-react"
+import { Leaf, Droplets, Factory, CheckCircle } from "lucide-react"
 import { Footer } from "@/components/footer"
 import { useLanguage } from "@/lib/language-context"
 import type { TranslationKey } from "@/lib/translations"
@@ -17,33 +17,14 @@ export default function SustainableGrowthPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-stone-50 to-stone-100 dark:from-gray-950 dark:to-gray-900">
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-[#0a0f0c] px-6 pt-8 pb-24">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(16,185,129,0.15)_0%,_transparent_65%)]" />
-
-        <Link
-          href="/"
-          className="absolute top-8 left-6 inline-flex items-center gap-2 text-white/50 hover:text-white font-medium transition-colors text-sm animate-fade-in"
-          style={{ animationDelay: '0ms' }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          {t("back_to_home")}
-        </Link>
-
-        <div className="relative max-w-3xl mx-auto text-center">
-          <span className="inline-block text-emerald-400 text-sm font-medium tracking-widest uppercase mb-4 animate-fade-in" style={{ animationDelay: '80ms' }}>
-            {t("sg_label")}
-          </span>
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-up" style={{ animationDelay: '180ms' }}>
-            {t("sg_heading")}
-          </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-amber-400 mx-auto rounded-full mb-8 animate-fade-in" style={{ animationDelay: '300ms' }} />
-          <p className="text-white/60 text-lg leading-relaxed max-w-xl mx-auto animate-fade-in" style={{ animationDelay: '400ms' }}>
-            {t("sg_subtitle")}
-          </p>
-        </div>
-
-      </section>
+      {/* Header */}
+      <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-8 py-5 flex items-center gap-4">
+        <Link href="/" className="text-3xl font-black text-amber-500 tracking-widest hover:opacity-80 transition-opacity">GAIA</Link>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
+        <span className="text-gray-400 text-sm font-medium uppercase tracking-widest">
+          {t("sg_heading")}
+        </span>
+      </div>
 
       {/* The Problem */}
       <section className="py-20 px-6 md:px-12 bg-white dark:bg-gray-900">
