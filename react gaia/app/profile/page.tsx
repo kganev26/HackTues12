@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, LogOut, User, LogIn } from "lucide-react"
+import { ArrowLeft, LogOut, User, LogIn, Bell, BellOff } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
+import { subscribePush, unsubscribePush, isPushSubscribed } from "@/lib/use-notifications"
 
 const API_URL = "http://10.210.46.104:5500"
 
@@ -37,6 +38,11 @@ export default function ProfilePage() {
   const [birthyearSaving, setBirthyearSaving] = useState(false)
 
   const [profileError, setProfileError] = useState("")
+
+  const [notifEnabled, setNotifEnabled] = useState(false)
+  const [notifDenied, setNotifDenied] = useState(false)
+  const [notifLoading, setNotifLoading] = useState(false)
+
   const router = useRouter()
   const { t } = useLanguage()
 
@@ -56,7 +62,40 @@ export default function ProfilePage() {
         const stored = localStorage.getItem("currentUser")
         if (stored) setUser(JSON.parse(stored))
       })
+
+    // Check current push subscription status
+    if ("Notification" in window && Notification.permission === "denied") {
+      setNotifDenied(true)
+    } else {
+      isPushSubscribed().then(setNotifEnabled)
+    }
   }, [])
+
+  const handleToggleNotifications = async () => {
+    setNotifLoading(true)
+    setProfileError("")
+    try {
+      if (notifEnabled) {
+        const ok = await unsubscribePush()
+        if (ok) setNotifEnabled(false)
+      } else {
+        const result = await subscribePush(API_URL)
+        if (result.ok) {
+          setNotifEnabled(true)
+          setNotifDenied(false)
+        } else {
+          if ("Notification" in window && Notification.permission === "denied") {
+            setNotifDenied(true)
+          }
+          setProfileError(result.error || "Failed to enable notifications")
+        }
+      }
+    } catch (err) {
+      setProfileError(err instanceof Error ? err.message : "Notification toggle failed")
+    } finally {
+      setNotifLoading(false)
+    }
+  }
 
   const handleSignOut = () => {
     localStorage.removeItem("token")
@@ -342,6 +381,37 @@ export default function ProfilePage() {
                       {t("cancel")}
                     </button>
                   </div>
+                )}
+              </div>
+
+              {/* Notifications toggle */}
+              <div className="px-6 py-4 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  {notifEnabled ? (
+                    <Bell className="w-4 h-4 text-amber-500" />
+                  ) : (
+                    <BellOff className="w-4 h-4 text-gray-400" />
+                  )}
+                  <span className="text-xs uppercase tracking-widest text-gray-700 dark:text-gray-400 font-medium">
+                    {t("profile_notifications")}
+                  </span>
+                </div>
+                {notifDenied ? (
+                  <span className="text-xs text-red-400 italic">{t("profile_notif_denied")}</span>
+                ) : (
+                  <button
+                    onClick={handleToggleNotifications}
+                    disabled={notifLoading}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 ${
+                      notifEnabled ? "bg-amber-500" : "bg-gray-300 dark:bg-gray-600"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        notifEnabled ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
                 )}
               </div>
 

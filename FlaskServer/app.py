@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify
+import requests
 from flask_cors import CORS
 import os
+import json
+import base64
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,6 +14,9 @@ import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from google import genai
 from google.genai import types
+from pywebpush import webpush, WebPushException
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives import serialization
 
 MAC_REGEX = re.compile(r'^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$')
 
@@ -20,6 +26,34 @@ CORS(app)
 JWT_SECRET = os.getenv("JWT_SECRET", "dev-only-default")
 JWT_ALGORITHM = "HS256"
 JWT_EXP_DELTA_MINUTES = 60
+
+# ── VAPID keys for Web Push ──────────────────────────────────────────
+VAPID_KEY_FILE = os.path.join(os.path.dirname(__file__), "vapid_private.pem")
+VAPID_CLAIMS = {"sub": "mailto:gaia@smartfarm.local"}
+
+def _load_or_generate_vapid():
+    if os.path.exists(VAPID_KEY_FILE):
+        with open(VAPID_KEY_FILE, "rb") as f:
+            private_key = serialization.load_pem_private_key(f.read(), password=None)
+    else:
+        private_key = ec.generate_private_key(ec.SECP256R1())
+        pem = private_key.private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8,
+            serialization.NoEncryption(),
+        )
+        with open(VAPID_KEY_FILE, "wb") as f:
+            f.write(pem)
+        print(f"Generated new VAPID key → {VAPID_KEY_FILE}")
+
+    raw_pub = private_key.public_key().public_bytes(
+        serialization.Encoding.X962,
+        serialization.PublicFormat.UncompressedPoint,
+    )
+    pub_b64 = base64.urlsafe_b64encode(raw_pub).rstrip(b"=").decode()
+    return pub_b64
+
+VAPID_PUBLIC_KEY_B64 = _load_or_generate_vapid()
 
 
 def create_jwt_token(user_id, username):
@@ -64,6 +98,16 @@ def init_db():
     ''')
     cur.execute("SELECT create_hypertable('sensor_data', 'time', if_not_exists => TRUE);")
 
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS push_subscriptions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            endpoint TEXT UNIQUE NOT NULL,
+            subscription JSONB NOT NULL,
+            created_at TIMESTAMP DEFAULT NOW()
+        );
+    ''')
+
     cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS agriculture VARCHAR(500);")
     cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS country VARCHAR(100);")
     cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS province VARCHAR(100);")
@@ -93,6 +137,67 @@ def get_user_id_from_request():
         return None, jsonify({'message': 'Invalid token'}), 401
 
 
+def check_and_notify(user_id, temp, humidity, soil_moisture, water_detected):
+    """Check sensor thresholds and send push notifications."""
+    alerts = []
+    if temp is not None and temp > 40:
+        alerts.append(f'High temperature: {temp:.1f}\u00b0C')
+    if temp is not None and temp < 5:
+        alerts.append(f'Low temperature: {temp:.1f}\u00b0C')
+    if humidity is not None and humidity < 20:
+        alerts.append(f'Low humidity: {humidity:.1f}%')
+    if soil_moisture is not None and soil_moisture < 20:
+        alerts.append(f'Low soil moisture: {soil_moisture:.1f}%')
+    if soil_moisture is not None and soil_moisture > 80:
+        alerts.append(f'High soil moisture: {soil_moisture:.1f}%')
+    if water_detected:
+        alerts.append('Water detected on sensor!')
+
+    if not alerts:
+        return
+
+    payload = json.dumps({
+        'title': 'GAIA Farm Alert',
+        'body': '\n'.join(alerts),
+        'url': '/sensors',
+    })
+
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            'SELECT id, subscription FROM push_subscriptions WHERE user_id = %s',
+            (user_id,),
+        )
+        rows = cur.fetchall()
+
+        expired_ids = []
+        for sub_id, sub_info in rows:
+            try:
+                webpush(
+                    subscription_info=sub_info,
+                    data=payload,
+                    vapid_private_key=VAPID_KEY_FILE,
+                    vapid_claims=VAPID_CLAIMS,
+                )
+            except WebPushException as e:
+                if e.response is not None and e.response.status_code in (404, 410):
+                    expired_ids.append(sub_id)
+                else:
+                    print(f"Push failed for sub {sub_id}: {e}")
+
+        if expired_ids:
+            cur.execute(
+                'DELETE FROM push_subscriptions WHERE id = ANY(%s)', (expired_ids,)
+            )
+            conn.commit()
+    except Exception as e:
+        print(f"Notification error: {e}")
+    finally:
+        cur.close()
+        conn.close()
+
+
 @app.route('/receive', methods=['POST'])
 def receive_data():
     try:
@@ -106,7 +211,7 @@ def receive_data():
         dht_h = data.get('dht_hum')
         soil = data.get('soil_moisture')
         water = data.get('water_detected', False)
-        
+
 
         if not mac_addr or dht_t is None or dht_h is None:
             return jsonify({'error': 'Missing data'}), 400
@@ -129,6 +234,9 @@ def receive_data():
         finally:
             cur.close()
             conn.close()
+
+        # Check thresholds and push notifications
+        check_and_notify(user_id, dht_t, dht_h, soil, water)
 
         return jsonify({"status": "success", "message": "Data received and parsed!"}), 200
 
@@ -348,6 +456,7 @@ def chat():
     if not user_message:
         return jsonify({'message': 'No message provided'}), 400
     
+    
     user_id, err_response, err_code = get_user_id_from_request()
     if err_response:
         system_prompt = f"You are GAIA, an AI farming assistant helping a random user, not signed in.\n"
@@ -425,6 +534,40 @@ def chat():
         ),
     )
     return jsonify({'reply': response.text}), 200
+
+
+@app.route('/vapid-public-key', methods=['GET'])
+def vapid_public_key():
+    return jsonify({'publicKey': VAPID_PUBLIC_KEY_B64}), 200
+
+
+@app.route('/subscribe', methods=['POST'])
+def subscribe_push():
+    user_id, err_response, err_code = get_user_id_from_request()
+    if err_response:
+        return err_response, err_code
+
+    subscription = (request.json or {}).get('subscription')
+    if not subscription or 'endpoint' not in subscription:
+        return jsonify({'message': 'Invalid subscription'}), 400
+
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute('''
+            INSERT INTO push_subscriptions (user_id, endpoint, subscription)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (endpoint) DO UPDATE SET
+                user_id = EXCLUDED.user_id,
+                subscription = EXCLUDED.subscription,
+                created_at = NOW()
+        ''', (user_id, subscription['endpoint'], json.dumps(subscription)))
+        conn.commit()
+    finally:
+        cur.close()
+        conn.close()
+
+    return jsonify({'message': 'Subscribed'}), 201
 
 
 @app.route('/user/profile', methods=['PATCH'])
