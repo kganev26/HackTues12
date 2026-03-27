@@ -24,7 +24,7 @@ const features = [
   {
     titleKey: "feat_growth_title" as TranslationKey,
     descKey: "feat_growth_desc" as TranslationKey,
-    image: "https://images.pexels.com/photos/1105019/pexels-photo-1105019.jpeg?auto=compress&cs=tinysrgb&w=600",
+    image: "https://images.pexels.com/photos/2166456/pexels-photo-2166456.jpeg?auto=compress&cs=tinysrgb&w=600",
     icon: Leaf,
     href: "/sustainable-growth",
   },
