@@ -7,7 +7,7 @@ Run once after the DB is up:
 """
 
 import psycopg2
-from datetime import datetime, timedelta
+import datetime
 import random
 import math
 
@@ -33,8 +33,8 @@ def ensure_columns(cur):
 
 
 def generate_records():
-    end_time = datetime.utcnow()
-    start_time = end_time - timedelta(days=DAYS_BACK)
+    end_time = datetime.datetime.now(datetime.UTC)
+    start_time = end_time - datetime.timedelta(days=DAYS_BACK)
 
     records = []
     current_time = start_time
@@ -63,7 +63,7 @@ def generate_records():
         soil = round(max(0.0, min(100.0, soil)), 1)
 
         records.append((current_time, temp, humidity, soil, water_detected))
-        current_time += timedelta(minutes=INTERVAL_MINUTES)
+        current_time += datetime.timedelta(minutes=INTERVAL_MINUTES)
 
     return records
 
