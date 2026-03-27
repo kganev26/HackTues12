@@ -6,7 +6,8 @@ import psycopg2
 from datetime import datetime, timedelta
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 MAC_REGEX = re.compile(r'^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$')
 
@@ -376,19 +377,27 @@ def chat():
 
     if sensor_rows:
         for r in sensor_rows:
-            system_prompt += f"  {r[0].strftime('%Y-%m-%d %H:%M')} | Temp: {r[1]:.1f}°C | Moisture: {r[2]:.1f}%\n"
+            temp = f"{r[1]:.1f}°C" if r[1] is not None else "N/A"
+            moist = f"{r[2]:.1f}%" if r[2] is not None else "N/A"
+            system_prompt += f"  {r[0].strftime('%Y-%m-%d %H:%M')} | Temp: {temp} | Moisture: {moist}\n"
     else:
         system_prompt += "  No sensor data available yet.\n"
 
     system_prompt += "\nGive concise, practical farming advice based on their data."
 
-    api_key = 'AIzaSyD0ehv-XDVxjWtkEqeYmKC8-MzHF73rqb8'
+    api_key = 'AIzaSyBeV-dOh4AvDjaBMfGx9X1KNB3cnEB-uGw'
     if not api_key:
         return jsonify({'message': 'AI service not configured (missing GEMINI_API_KEY)'}), 503
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=system_prompt)
-    response = model.generate_content(user_message)
+    client = genai.Client(api_key=api_key)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=user_message,
+        config=types.GenerateContentConfig(
+            system_instruction=system_prompt,
+            tools=[types.Tool(google_search=types.GoogleSearch())]
+        ),
+    )
     return jsonify({'reply': response.text}), 200
 
 
