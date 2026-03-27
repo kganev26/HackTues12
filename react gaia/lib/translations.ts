@@ -22,7 +22,7 @@ export const translations = {
     feat_ai_title: "AI Analysis",
     feat_ai_desc: "Artificial Intelligence analyzes your farm data to provide actionable insights and maximize efficiency. Try GAIA AI now!",
     feat_growth_title: "Recycling Wasted Water",
-    feat_growth_desc: "Personalized advice and automation triggers to ensure your plants grow healthy and strong, using recycled water.",
+    feat_growth_desc: "Gaia transforms waste water from Data centers and servers cooling into a valuable resource for sustainable irrigation.",
 
     // About (homepage section)
     about_label: "Our Mission",
@@ -185,7 +185,7 @@ export const translations = {
     feat_ai_title: "AI анализ",
     feat_ai_desc: "Изкуственият интелект анализира данните от фермата ви и предоставя полезни прозрения за максимална ефективност. Опитайте GAIA AI сега!",
     feat_growth_title: "Рециклиране на отпадъчна вода",
-    feat_growth_desc: "Персонализирани съвети и автоматизация, които гарантират здравословен растеж на растенията ви с рециклирана вода.",
+    feat_growth_desc: "Gaia превръща отпадъчната вода от центрове за данни и охлаждане на сървъри в ценен ресурс за устойчиво напояване.",
 
     // About (homepage section)
     about_label: "Нашата мисия",
