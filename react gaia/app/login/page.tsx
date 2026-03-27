@@ -36,6 +36,7 @@ export default function LoginPage() {
     username: "",
     password: "",
     agriculture: [] as string[],
+    customAgriculture: "",
     country: "",
     province: "",
   })
@@ -80,7 +81,12 @@ export default function LoginPage() {
     if (!isLogin) {
       body.firstname = formData.firstname
       body.lastname = formData.lastname
-      body.agriculture = formData.agriculture.join(",")
+      const allCrops = [...formData.agriculture]
+      if (formData.agriculture.includes("other") && formData.customAgriculture.trim()) {
+        allCrops.splice(allCrops.indexOf("other"), 1)
+        allCrops.push(...formData.customAgriculture.split(",").map((s) => s.trim()).filter(Boolean))
+      }
+      body.agriculture = allCrops.join(",")
       body.country = formData.country
       body.province = formData.province
     }
@@ -119,16 +125,16 @@ export default function LoginPage() {
   const inputClass = "peer w-full px-4 py-3 border-2 border-gray-100 dark:border-gray-700 rounded-xl outline-none focus:border-green-700 dark:focus:border-green-500 transition-colors text-foreground bg-card"
 
   const agricultureOptions = [
-    { value: "crops", key: "login_crops" as const },
-    { value: "vegetables", key: "login_vegetables" as const },
-    { value: "fruits", key: "login_fruits" as const },
-    { value: "livestock", key: "login_livestock" as const },
-    { value: "poultry", key: "login_poultry" as const },
-    { value: "dairy", key: "login_dairy" as const },
-    { value: "aquaculture", key: "login_aquaculture" as const },
-    { value: "greenhouse", key: "login_greenhouse" as const },
-    { value: "mixed", key: "login_mixed" as const },
-    { value: "other", key: "login_other" as const },
+    { value: "tomatoes", key: "login_tomatoes" as const },
+    { value: "potatoes", key: "login_potatoes" as const },
+    { value: "cucumbers", key: "login_cucumbers" as const },
+    { value: "peppers", key: "login_peppers" as const },
+    { value: "wheat", key: "login_wheat" as const },
+    { value: "corn", key: "login_corn" as const },
+    { value: "sunflower", key: "login_sunflower" as const },
+    { value: "grapes", key: "login_grapes" as const },
+    { value: "apples", key: "login_apples" as const },
+    { value: "watermelon", key: "login_watermelon" as const },
   ]
 
   return (
@@ -271,6 +277,24 @@ export default function LoginPage() {
                     </label>
                   ))}
                 </div>
+                <label className="flex items-center gap-2 cursor-pointer mt-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.agriculture.includes("other")}
+                    onChange={() => handleAgricultureChange("other")}
+                    className="accent-green-700 w-4 h-4"
+                  />
+                  <span className="text-sm text-foreground">{t("login_other")}</span>
+                </label>
+                {formData.agriculture.includes("other") && (
+                  <input
+                    type="text"
+                    placeholder={t("login_other_placeholder")}
+                    value={formData.customAgriculture}
+                    onChange={(e) => setFormData({ ...formData, customAgriculture: e.target.value })}
+                    className="mt-2 w-full px-4 py-2 border-2 border-gray-100 dark:border-gray-700 rounded-xl outline-none focus:border-green-700 dark:focus:border-green-500 transition-colors text-foreground bg-card text-sm"
+                  />
+                )}
               </div>
 
               {/* Country */}
