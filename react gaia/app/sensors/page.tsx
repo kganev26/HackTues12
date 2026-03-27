@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useLanguage } from "@/lib/language-context"
 import type { TranslationKey } from "@/lib/translations"
 
-const GRAFANA_BASE = "http://localhost:3000"
+const GRAFANA_BASE = "http://10.210.46.104:3000"
 const DASHBOARD_UID = "gaia-sensors"
 const DASHBOARD_SLUG = "gaia-sensor-dashboard"
 

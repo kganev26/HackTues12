@@ -66,7 +66,7 @@ def create_jwt_token(user_id, username):
 
 def get_db_connection():
     return psycopg2.connect(
-        host='localhost',
+        host=os.environ.get('DB_HOST', 'localhost'),
         database='smartfarm',
         user='farm_admin',
         password='hackathon_password'
