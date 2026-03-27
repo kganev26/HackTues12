@@ -66,6 +66,7 @@ function SelectGroup({
 }
 
 export default function SensorsPage() {
+  const { t } = useLanguage()
   const [from, setFrom] = useState("now-7d")
   const [refresh, setRefresh] = useState("30s")
   const [userId, setUserId] = useState<string | null>(null)
