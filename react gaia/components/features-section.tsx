@@ -17,7 +17,7 @@ const features = [
     description: "Artificial Intelligence analyzes your farm data to provide actionable insights and maximize efficiency.",
     image: "https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress&cs=tinysrgb&w=600",
     icon: Cpu,
-    href: null,
+    href: "/chat",
   },
   {
     title: "Sustainable Growth",
