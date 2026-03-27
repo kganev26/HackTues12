@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, LogOut, User, LogIn } from "lucide-react"
+import { LogOut, User, LogIn } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 const API_URL = "http://10.210.46.104:5500"
@@ -124,22 +124,11 @@ export default function ProfilePage() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-8 py-5 flex items-center gap-4">
-        <span className="text-3xl font-black text-amber-500 tracking-widest">GAIA</span>
+        <Link href="/" className="text-3xl font-black text-amber-500 tracking-widest hover:opacity-80 transition-opacity">GAIA</Link>
         <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
         <span className="text-gray-400 text-sm font-medium uppercase tracking-widest">
           {t("profile_label")}
         </span>
-      </div>
-
-      {/* Back link */}
-      <div className="px-8 pt-6">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          {t("back_to_home")}
-        </Link>
       </div>
 
       {/* Content */}
