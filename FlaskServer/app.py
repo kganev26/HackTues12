@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 import re
 import psycopg2
-from datetime import datetime, timedelta
+import datetime
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from google import genai
@@ -23,7 +26,7 @@ def create_jwt_token(user_id, username):
     payload = {
         "user_id": user_id,
         "username": username,
-        "exp": datetime.utcnow() + timedelta(minutes=JWT_EXP_DELTA_MINUTES)
+        "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=JWT_EXP_DELTA_MINUTES)
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
@@ -117,7 +120,7 @@ def receive_data():
             user_id = user[0]
 
             cur.execute('INSERT INTO sensor_data (time, temperature, moisture, user_id) VALUES (%s, %s, %s, %s)',
-                    (datetime.utcnow(), dht_t, dht_h, user_id))
+                    (datetime.datetime.now(datetime.UTC), dht_t, dht_h, user_id))
             conn.commit()
         finally:
             cur.close()
@@ -374,6 +377,7 @@ def chat():
     system_prompt += f"- Gender: {gender or 'Not specified'}\n"
     system_prompt += f"- Birth year: {birthyear or 'Not specified'}\n\n"
     system_prompt += "Recent sensor readings (newest first):\n"
+    system_prompt += "The user is bulgarian, so use bulgarian as your default language\n"
 
     if sensor_rows:
         for r in sensor_rows:
@@ -385,7 +389,7 @@ def chat():
 
     system_prompt += "\nGive concise, practical farming advice based on their data."
 
-    api_key = 'AIzaSyBeV-dOh4AvDjaBMfGx9X1KNB3cnEB-uGw'
+    api_key = os.environ.get('GEMINI_API_KEY')
     if not api_key:
         return jsonify({'message': 'AI service not configured (missing GEMINI_API_KEY)'}), 503
 
