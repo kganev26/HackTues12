@@ -56,8 +56,10 @@ def init_db():
         CREATE TABLE IF NOT EXISTS sensor_data (
             time TIMESTAMP NOT NULL,
             temperature REAL NOT NULL,
-            moisture REAL NOT NULL,
-            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            humidity REAL NOT NULL,
+            soil_moisture REAL NOT NULL,
+            water_detected BOOLEAN DEFAULT FALSE
         );
     ''')
     cur.execute("SELECT create_hypertable('sensor_data', 'time', if_not_exists => TRUE);")
@@ -99,10 +101,12 @@ def receive_data():
         if not data:
             return jsonify({"status": "error", "message": "No JSON payload provided"}), 400
 
+        mac_addr = data.get('mac_address')
         dht_t = data.get('dht_temp')
         dht_h = data.get('dht_hum')
+        soil = data.get('soil_moisture')
         water = data.get('water_detected', False)
-        mac_addr = data.get('mac_address')
+        
 
         if not mac_addr or dht_t is None or dht_h is None:
             return jsonify({'error': 'Missing data'}), 400
@@ -119,8 +123,8 @@ def receive_data():
 
             user_id = user[0]
 
-            cur.execute('INSERT INTO sensor_data (time, temperature, moisture, user_id) VALUES (%s, %s, %s, %s)',
-                    (datetime.datetime.now(datetime.UTC), dht_t, dht_h, user_id))
+            cur.execute('INSERT INTO sensor_data (time, temperature, user_id, humidity, soil_moisture, water_detected) VALUES (%s, %s, %s, %s, %s, %s)',
+                    (datetime.datetime.now(datetime.UTC), dht_t, user_id, dht_h, soil, water))
             conn.commit()
         finally:
             cur.close()
@@ -357,7 +361,7 @@ def chat():
         )
         user_row = cur.fetchone()
         cur.execute('''
-            SELECT time, temperature, moisture FROM sensor_data
+            SELECT time, temperature, humidity, soil_moisture, water_detected FROM sensor_data
             WHERE user_id = %s ORDER BY time DESC LIMIT 20
         ''', (user_id,))
         sensor_rows = cur.fetchall()
