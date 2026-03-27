@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react"
 import { ArrowRight, User } from "lucide-react"
 import Link from "next/link"
+import { useLanguage } from "@/lib/language-context"
 
 export function HeroSection() {
   const [loggedIn, setLoggedIn] = useState(false)
+  const { t } = useLanguage()
 
   useEffect(() => {
     setLoggedIn(!!localStorage.getItem("currentUser"))
@@ -42,7 +44,7 @@ export function HeroSection() {
           className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-light text-gray-100 animate-fade-in"
           style={{ animationDelay: '350ms' }}
         >
-          The next generation of AI-driven agriculture. Monitor, analyze, and grow your farm with precision technology.
+          {t("hero_tagline")}
         </p>
 
         <div
@@ -54,7 +56,7 @@ export function HeroSection() {
               href="/profile"
               className="inline-flex items-center gap-2 px-10 py-4 bg-green-700 hover:bg-green-800 text-white rounded-full font-bold text-lg transition-all duration-300 shadow-lg shadow-green-700/40 hover:-translate-y-1 hover:scale-105 hover:shadow-xl hover:shadow-green-700/50"
             >
-              View Profile
+              {t("hero_view_profile")}
               <User className="w-5 h-5" />
             </Link>
           ) : (
@@ -62,7 +64,7 @@ export function HeroSection() {
               href="/login"
               className="inline-flex items-center gap-2 px-10 py-4 bg-green-700 hover:bg-green-800 text-white rounded-full font-bold text-lg transition-all duration-300 shadow-lg shadow-green-700/40 hover:-translate-y-1 hover:scale-105 hover:shadow-xl hover:shadow-green-700/50"
             >
-              Get Started
+              {t("hero_get_started")}
               <ArrowRight className="w-5 h-5" />
             </Link>
           )}

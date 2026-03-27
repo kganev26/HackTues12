@@ -4,8 +4,9 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
+import { useLanguage } from "@/lib/language-context"
 
-const API_URL = "/api"
+const API_URL = "http://10.210.46.104:5500"
 
 const COUNTRIES = [
   "Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan",
@@ -39,6 +40,7 @@ export default function LoginPage() {
     province: "",
   })
   const router = useRouter()
+  const { t } = useLanguage()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -113,8 +115,21 @@ export default function LoginPage() {
     setError("")
   }
 
-  const floatingLabel = "absolute left-4 top-3 text-muted-foreground pointer-events-none transition-all duration-200 peer-focus:-top-5 peer-focus:left-1 peer-focus:text-xs peer-focus:text-green-700 peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-5 peer-[:not(:placeholder-shown)]:left-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-green-700 peer-[:not(:placeholder-shown)]:font-bold"
-  const inputClass = "peer w-full px-4 py-3 border-2 border-gray-100 rounded-xl outline-none focus:border-green-700 transition-colors text-foreground bg-card"
+  const floatingLabel = "absolute left-4 top-3 text-muted-foreground pointer-events-none transition-all duration-200 peer-focus:-top-5 peer-focus:left-1 peer-focus:text-xs peer-focus:text-green-700 dark:peer-focus:text-green-400 peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-5 peer-[:not(:placeholder-shown)]:left-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-green-700 dark:peer-[:not(:placeholder-shown)]:text-green-400 peer-[:not(:placeholder-shown)]:font-bold"
+  const inputClass = "peer w-full px-4 py-3 border-2 border-gray-100 dark:border-gray-700 rounded-xl outline-none focus:border-green-700 dark:focus:border-green-500 transition-colors text-foreground bg-card"
+
+  const agricultureOptions = [
+    { value: "crops", key: "login_crops" as const },
+    { value: "vegetables", key: "login_vegetables" as const },
+    { value: "fruits", key: "login_fruits" as const },
+    { value: "livestock", key: "login_livestock" as const },
+    { value: "poultry", key: "login_poultry" as const },
+    { value: "dairy", key: "login_dairy" as const },
+    { value: "aquaculture", key: "login_aquaculture" as const },
+    { value: "greenhouse", key: "login_greenhouse" as const },
+    { value: "mixed", key: "login_mixed" as const },
+    { value: "other", key: "login_other" as const },
+  ]
 
   return (
     <div className="relative min-h-screen flex items-center justify-center">
@@ -134,7 +149,7 @@ export default function LoginPage() {
         style={{ animationDelay: '0ms' }}
       >
         <ArrowLeft className="w-5 h-5" />
-        <span>Back to Home</span>
+        <span>{t("back_to_home")}</span>
       </Link>
 
       {/* Form Container */}
@@ -142,9 +157,9 @@ export default function LoginPage() {
         className="relative z-10 w-full max-w-md px-5 animate-fade-up"
         style={{ animationDelay: '150ms' }}
       >
-        <div className="bg-card rounded-3xl shadow-2xl p-12 text-center">
+        <div className="bg-card rounded-3xl shadow-2xl p-12 text-center border border-transparent dark:border-gray-700">
           <h1
-            className="text-5xl font-black text-gray-600 tracking-tight mb-0 animate-fade-up"
+            className="text-5xl font-black text-gray-600 dark:text-gray-300 tracking-tight mb-0 animate-fade-up"
             style={{ animationDelay: '250ms' }}
           >
             Gaia
@@ -154,14 +169,14 @@ export default function LoginPage() {
             className="text-sm text-muted-foreground uppercase tracking-widest font-semibold mb-8 animate-fade-in"
             style={{ animationDelay: '350ms' }}
           >
-            {isLogin ? "Login" : step === 1 ? "Create Account" : "About You"}
+            {isLogin ? t("login_title") : step === 1 ? t("login_create_account") : t("login_about_you")}
           </h2>
 
           {/* Step indicator for registration */}
           {!isLogin && (
             <div className="flex items-center justify-center gap-2 mb-6">
-              <div className={`h-2 w-8 rounded-full transition-colors ${step === 1 ? "bg-green-700" : "bg-green-200"}`} />
-              <div className={`h-2 w-8 rounded-full transition-colors ${step === 2 ? "bg-green-700" : "bg-green-200"}`} />
+              <div className={`h-2 w-8 rounded-full transition-colors ${step === 1 ? "bg-green-700" : "bg-green-200 dark:bg-green-900"}`} />
+              <div className={`h-2 w-8 rounded-full transition-colors ${step === 2 ? "bg-green-700" : "bg-green-200 dark:bg-green-900"}`} />
             </div>
           )}
 
@@ -180,7 +195,7 @@ export default function LoginPage() {
                       required
                       className={inputClass}
                     />
-                    <label className={floatingLabel}>First Name</label>
+                    <label className={floatingLabel}>{t("login_first_name")}</label>
                   </div>
 
                   <div className="relative">
@@ -193,7 +208,7 @@ export default function LoginPage() {
                       required
                       className={inputClass}
                     />
-                    <label className={floatingLabel}>Last Name</label>
+                    <label className={floatingLabel}>{t("login_last_name")}</label>
                   </div>
                 </>
               )}
@@ -208,7 +223,7 @@ export default function LoginPage() {
                   required
                   className={inputClass}
                 />
-                <label className={floatingLabel}>Username</label>
+                <label className={floatingLabel}>{t("login_username")}</label>
               </div>
 
               <div className="relative">
@@ -221,7 +236,7 @@ export default function LoginPage() {
                   required
                   className={inputClass}
                 />
-                <label className={floatingLabel}>Password</label>
+                <label className={floatingLabel}>{t("login_password")}</label>
               </div>
 
               {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -230,7 +245,7 @@ export default function LoginPage() {
                 type="submit"
                 className="w-full py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl font-semibold text-sm transition-all duration-300 hover:-translate-y-0.5"
               >
-                {isLogin ? "Login" : "Continue with the registration"}
+                {isLogin ? t("login_button") : t("login_continue")}
               </button>
             </form>
           )}
@@ -240,22 +255,11 @@ export default function LoginPage() {
             <form onSubmit={handleStep2Submit} className="space-y-5">
               {/* Agriculture */}
               <div>
-                <label className="block text-left text-xs text-green-700 font-bold mb-2 ml-1">
-                  What agricultures do you have?
+                <label className="block text-left text-xs text-green-700 dark:text-green-400 font-bold mb-2 ml-1">
+                  {t("login_agriculture_label")}
                 </label>
                 <div className="grid grid-cols-2 gap-2 text-left">
-                  {[
-                    { value: "crops", label: "Crops" },
-                    { value: "vegetables", label: "Vegetables" },
-                    { value: "fruits", label: "Fruits & Orchards" },
-                    { value: "livestock", label: "Livestock" },
-                    { value: "poultry", label: "Poultry" },
-                    { value: "dairy", label: "Dairy Farming" },
-                    { value: "aquaculture", label: "Aquaculture" },
-                    { value: "greenhouse", label: "Greenhouse" },
-                    { value: "mixed", label: "Mixed Farming" },
-                    { value: "other", label: "Other" },
-                  ].map(({ value, label }) => (
+                  {agricultureOptions.map(({ value, key }) => (
                     <label key={value} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -263,7 +267,7 @@ export default function LoginPage() {
                         onChange={() => handleAgricultureChange(value)}
                         className="accent-green-700 w-4 h-4"
                       />
-                      <span className="text-sm text-foreground">{label}</span>
+                      <span className="text-sm text-foreground">{t(key)}</span>
                     </label>
                   ))}
                 </div>
@@ -271,17 +275,17 @@ export default function LoginPage() {
 
               {/* Country */}
               <div className="relative">
-                <label className="block text-left text-xs text-green-700 font-bold mb-1 ml-1">
-                  Country
+                <label className="block text-left text-xs text-green-700 dark:text-green-400 font-bold mb-1 ml-1">
+                  {t("login_country")}
                 </label>
                 <select
                   name="country"
                   value={formData.country}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl outline-none focus:border-green-700 transition-colors text-foreground bg-card appearance-none"
+                  className="w-full px-4 py-3 border-2 border-gray-100 dark:border-gray-700 rounded-xl outline-none focus:border-green-700 dark:focus:border-green-500 transition-colors text-foreground bg-card appearance-none"
                 >
-                  <option value="" disabled>Select country</option>
+                  <option value="" disabled>{t("login_select_country")}</option>
                   {COUNTRIES.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
@@ -299,7 +303,7 @@ export default function LoginPage() {
                   required
                   className={inputClass}
                 />
-                <label className={floatingLabel}>Province / State</label>
+                <label className={floatingLabel}>{t("login_province")}</label>
               </div>
 
               {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -308,15 +312,15 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => { setStep(1); setError("") }}
-                  className="flex-1 py-2.5 border-2 border-green-700 text-green-700 hover:bg-green-50 rounded-xl font-semibold text-sm transition-all duration-300"
+                  className="flex-1 py-2.5 border-2 border-green-700 text-green-700 dark:text-green-400 dark:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-xl font-semibold text-sm transition-all duration-300"
                 >
-                  Back
+                  {t("back")}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl font-semibold text-sm transition-all duration-300 hover:-translate-y-0.5"
                 >
-                  Finish your profile
+                  {t("login_finish")}
                 </button>
               </div>
             </form>
@@ -324,12 +328,12 @@ export default function LoginPage() {
 
           {step === 1 && (
             <p className="mt-6 text-sm text-muted-foreground">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}
+              {isLogin ? t("login_no_account") : t("login_has_account")}
               <button
                 onClick={switchMode}
-                className="ml-1 text-green-700 font-bold hover:underline"
+                className="ml-1 text-green-700 dark:text-green-400 font-bold hover:underline"
               >
-                {isLogin ? "Register" : "Login"}
+                {isLogin ? t("login_register") : t("login_button")}
               </button>
             </p>
           )}
