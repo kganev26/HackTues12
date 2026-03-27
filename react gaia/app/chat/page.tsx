@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, Send, Loader2 } from "lucide-react"
+import { useLanguage } from "@/lib/language-context"
 
 const API_URL = "/api"
 
@@ -12,8 +13,9 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const { t } = useLanguage()
   const [messages, setMessages] = useState<Message[]>([
-    { role: "ai", text: "Hello! I'm GAIA, your AI farming assistant. I have access to your profile and sensor data. Ask me anything about your farm!" }
+    { role: "ai", text: t("chat_greeting") }
   ])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
@@ -64,25 +66,25 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#0a0a0a] text-white">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
       {/* Header */}
-      <div className="border-b border-white/10 px-6 py-4 flex items-center gap-4 shrink-0">
+      <div className="border-b border-gray-200 dark:border-white/10 bg-white dark:bg-transparent px-6 py-4 flex items-center gap-4 shrink-0">
         <Link
           href="/"
-          className="flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm"
+          className="flex items-center gap-2 text-gray-400 dark:text-white/50 hover:text-gray-700 dark:hover:text-white transition-colors text-sm"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back
+          {t("chat_back")}
         </Link>
-        <div className="w-px h-5 bg-white/10" />
-        <span className="text-amber-400 font-black tracking-widest text-lg">GAIA</span>
-        <div className="w-px h-5 bg-white/10" />
-        <span className="text-white/40 text-sm uppercase tracking-widest font-medium">AI Assistant</span>
+        <div className="w-px h-5 bg-gray-200 dark:bg-white/10" />
+        <span className="text-amber-500 dark:text-amber-400 font-black tracking-widest text-lg">GAIA</span>
+        <div className="w-px h-5 bg-gray-200 dark:bg-white/10" />
+        <span className="text-gray-400 dark:text-white/40 text-sm uppercase tracking-widest font-medium">{t("chat_ai_assistant")}</span>
         <Link
           href="/profile"
-          className="ml-auto text-white/40 hover:text-white/70 text-xs uppercase tracking-widest transition-colors"
+          className="ml-auto text-gray-400 dark:text-white/40 hover:text-gray-700 dark:hover:text-white/70 text-xs uppercase tracking-widest transition-colors"
         >
-          Profile
+          {t("chat_profile")}
         </Link>
       </div>
 
@@ -103,7 +105,7 @@ export default function ChatPage() {
                 className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                   msg.role === "user"
                     ? "bg-green-700 text-white rounded-br-sm"
-                    : "bg-white/5 border border-white/10 text-white/90 rounded-bl-sm"
+                    : "bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-800 dark:text-white/90 rounded-bl-sm"
                 }`}
               >
                 {msg.text}
@@ -116,9 +118,9 @@ export default function ChatPage() {
               <div className="w-7 h-7 rounded-full bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-xs font-black text-amber-400 mr-2 mt-1 shrink-0">
                 G
               </div>
-              <div className="bg-white/5 border border-white/10 px-4 py-3 rounded-2xl rounded-bl-sm flex items-center gap-2 text-white/40 text-sm">
+              <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-4 py-3 rounded-2xl rounded-bl-sm flex items-center gap-2 text-gray-400 dark:text-white/40 text-sm">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Thinking…
+                {t("chat_thinking")}
               </div>
             </div>
           )}
@@ -132,15 +134,15 @@ export default function ChatPage() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-white/10 px-4 py-4 shrink-0">
+      <div className="border-t border-gray-200 dark:border-white/10 bg-white dark:bg-transparent px-4 py-4 shrink-0">
         <div className="max-w-2xl mx-auto flex gap-3 items-end">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={1}
-            placeholder="Ask about your farm, sensor readings, crop advice…"
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-amber-400/50 transition-colors resize-none"
+            placeholder={t("chat_placeholder")}
+            className="flex-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-white/30 outline-none focus:border-amber-400/50 transition-colors resize-none"
             style={{ maxHeight: "120px", overflowY: "auto" }}
           />
           <button
@@ -151,7 +153,7 @@ export default function ChatPage() {
             <Send className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-center text-white/20 text-xs mt-2">Enter to send · Shift+Enter for new line</p>
+        <p className="text-center text-gray-400 dark:text-white/20 text-xs mt-2">{t("chat_hint")}</p>
       </div>
     </div>
   )

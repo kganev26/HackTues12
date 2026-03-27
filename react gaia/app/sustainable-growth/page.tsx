@@ -3,185 +3,125 @@
 import Link from "next/link"
 import { Leaf, Droplets, Recycle, Factory, ArrowLeft, CheckCircle, FlaskConical, Truck } from "lucide-react"
 import { Footer } from "@/components/footer"
+import { useLanguage } from "@/lib/language-context"
+import type { TranslationKey } from "@/lib/translations"
 
-const steps = [
-  {
-    number: 1,
-    icon: Factory,
-    title: "Collection",
-    body: "Wastewater discharged by data centre cooling systems is captured at source before it can enter drainage or evaporate. Gaia partners directly with data centre operators to integrate collection infrastructure at their facilities.",
-  },
-  {
-    number: 2,
-    icon: FlaskConical,
-    title: "Primary Filtration",
-    body: "The collected water passes through a multi-stage physical filtration system that removes particulates, heavy metals, and chemical residues from coolant fluids, reducing turbidity and making the water safe for further processing.",
-  },
-  {
-    number: 3,
-    icon: Recycle,
-    title: "Biological Treatment",
-    body: "A bio-filtration stage uses naturally occurring beneficial microorganisms to break down organic contaminants. This mirrors the natural water cycle and produces water with a healthy mineral profile suited for irrigation.",
-  },
-  {
-    number: 4,
-    icon: Truck,
-    title: "Quality Certification & Delivery",
-    body: "Every batch is tested against agricultural water quality standards before it is certified safe. Gaia's smart irrigation system then delivers the right amount of certified water to each crop zone based on real-time sensor data from the farm.",
-  },
+const stepKeys = [
+  { icon: Factory, titleKey: "sg_step1_title" as TranslationKey, bodyKey: "sg_step1_body" as TranslationKey },
+  { icon: FlaskConical, titleKey: "sg_step2_title" as TranslationKey, bodyKey: "sg_step2_body" as TranslationKey },
+  { icon: Recycle, titleKey: "sg_step3_title" as TranslationKey, bodyKey: "sg_step3_body" as TranslationKey },
+  { icon: Truck, titleKey: "sg_step4_title" as TranslationKey, bodyKey: "sg_step4_body" as TranslationKey },
 ]
 
-const benefits = [
-  "Consistent access to irrigation water even during drought periods.",
-  "Reduced water costs — recycled water is supplied at a fraction of municipal rates.",
-  "Mineral-balanced water that supports healthier root systems and higher yields.",
-  "Full traceability: every litre delivered is logged and certified.",
-  "Automated delivery schedules driven by Gaia's AI, so water is never wasted.",
-  "Lower carbon footprint — repurposing existing water reduces treatment energy.",
+const benefitKeys: TranslationKey[] = [
+  "sg_benefit_1", "sg_benefit_2", "sg_benefit_3",
+  "sg_benefit_4", "sg_benefit_5", "sg_benefit_6",
 ]
 
-const stats = [
-  { value: "4-stage", label: "filtration process" },
-  { value: "100%", label: "quality certified" },
-  { value: "0 waste", label: "circular water loop" },
+const statKeys: { value: string; labelKey: TranslationKey }[] = [
+  { value: "4-stage", labelKey: "sg_stat_filtration" },
+  { value: "100%", labelKey: "sg_stat_certified" },
+  { value: "0 waste", labelKey: "sg_stat_waste" },
 ]
 
 export default function SustainableGrowthPage() {
+  const { t } = useLanguage()
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-stone-50 to-stone-100">
+    <main className="min-h-screen bg-gradient-to-b from-stone-50 to-stone-100 dark:from-gray-950 dark:to-gray-900">
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#0a0f0c] px-6 pt-8 pb-24">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(16,185,129,0.15)_0%,_transparent_65%)]" />
 
-        {/* Back button — top left */}
         <Link
           href="/"
           className="absolute top-8 left-6 inline-flex items-center gap-2 text-white/50 hover:text-white font-medium transition-colors text-sm animate-fade-in"
           style={{ animationDelay: '0ms' }}
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Home
+          {t("back_to_home")}
         </Link>
 
-        {/* Hero text — centred */}
         <div className="relative max-w-3xl mx-auto text-center">
-          <span
-            className="inline-block text-emerald-400 text-sm font-medium tracking-widest uppercase mb-4 animate-fade-in"
-            style={{ animationDelay: '80ms' }}
-          >
-            Sustainability
+          <span className="inline-block text-emerald-400 text-sm font-medium tracking-widest uppercase mb-4 animate-fade-in" style={{ animationDelay: '80ms' }}>
+            {t("sg_label")}
           </span>
-          <h1
-            className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-up"
-            style={{ animationDelay: '180ms' }}
-          >
-            Sustainable Growth
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-up" style={{ animationDelay: '180ms' }}>
+            {t("sg_heading")}
           </h1>
-          <div
-            className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-amber-400 mx-auto rounded-full mb-8 animate-fade-in"
-            style={{ animationDelay: '300ms' }}
-          />
-          <p
-            className="text-white/60 text-lg leading-relaxed max-w-xl mx-auto animate-fade-in"
-            style={{ animationDelay: '400ms' }}
-          >
-            How Gaia turns the wastewater from AI data centres into clean, certified irrigation water for your farm.
+          <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-amber-400 mx-auto rounded-full mb-8 animate-fade-in" style={{ animationDelay: '300ms' }} />
+          <p className="text-white/60 text-lg leading-relaxed max-w-xl mx-auto animate-fade-in" style={{ animationDelay: '400ms' }}>
+            {t("sg_subtitle")}
           </p>
         </div>
 
         {/* Stats strip */}
-        <div
-          className="relative max-w-2xl mx-auto mt-14 grid grid-cols-3 divide-x divide-white/10 animate-fade-up"
-          style={{ animationDelay: '520ms' }}
-        >
-          {stats.map((s) => (
-            <div key={s.label} className="text-center px-6 py-4">
+        <div className="relative max-w-2xl mx-auto mt-14 grid grid-cols-3 divide-x divide-white/10 animate-fade-up" style={{ animationDelay: '520ms' }}>
+          {statKeys.map((s) => (
+            <div key={s.labelKey} className="text-center px-6 py-4">
               <div className="text-2xl font-bold text-emerald-400 mb-1">{s.value}</div>
-              <div className="text-white/40 text-xs uppercase tracking-widest">{s.label}</div>
+              <div className="text-white/40 text-xs uppercase tracking-widest">{t(s.labelKey)}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* The Problem */}
-      <section className="py-20 px-6 md:px-12 bg-white">
+      <section className="py-20 px-6 md:px-12 bg-white dark:bg-gray-900">
         <div className="max-w-4xl mx-auto">
-          <div
-            className="flex items-center gap-3 mb-8 animate-fade-up"
-            style={{ animationDelay: '0ms' }}
-          >
-            <span className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 mb-8 animate-fade-up" style={{ animationDelay: '0ms' }}>
+            <span className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
               <Factory className="w-5 h-5" />
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold text-stone-900">
-              The Problem: AI Data Centres Are Thirsty
+            <h2 className="text-2xl md:text-3xl font-bold text-stone-900 dark:text-white">
+              {t("sg_problem_title")}
             </h2>
           </div>
 
           <div className="pl-[52px] space-y-5">
-            <p
-              className="text-lg text-stone-600 leading-relaxed animate-fade-in"
-              style={{ animationDelay: '100ms' }}
-            >
-              Modern AI data centres consume enormous amounts of water to cool their servers. A single large
-              facility can use millions of litres per day — most of which is expelled as hot, contaminated
-              wastewater and becomes a burden on local freshwater supplies and ecosystems.
+            <p className="text-lg text-stone-600 dark:text-stone-400 leading-relaxed animate-fade-in" style={{ animationDelay: '100ms' }}>
+              {t("sg_problem_p1")}
             </p>
-            <p
-              className="text-lg text-stone-600 leading-relaxed animate-fade-in"
-              style={{ animationDelay: '200ms' }}
-            >
-              At the same time, farmers face increasingly severe water shortages driven by climate change and
-              growing demand. These two crises — excess industrial wastewater and agricultural scarcity — are
-              exactly what Gaia was built to bridge.
+            <p className="text-lg text-stone-600 dark:text-stone-400 leading-relaxed animate-fade-in" style={{ animationDelay: '200ms' }}>
+              {t("sg_problem_p2")}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Filtration Pipeline — vertical timeline */}
+      {/* Filtration Pipeline */}
       <section className="py-20 px-6 md:px-12">
         <div className="max-w-3xl mx-auto">
-          <div
-            className="flex items-center gap-3 mb-12 animate-fade-up"
-            style={{ animationDelay: '0ms' }}
-          >
-            <span className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 mb-12 animate-fade-up" style={{ animationDelay: '0ms' }}>
+            <span className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <Recycle className="w-5 h-5" />
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold text-stone-900">
-              The Filtration Pipeline
+            <h2 className="text-2xl md:text-3xl font-bold text-stone-900 dark:text-white">
+              {t("sg_pipeline_title")}
             </h2>
           </div>
 
           <div className="relative">
-            {/* Vertical line */}
             <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-emerald-400 via-emerald-300 to-transparent" />
 
             <div className="space-y-10">
-              {steps.map((step, i) => {
+              {stepKeys.map((step, i) => {
                 const Icon = step.icon
                 return (
-                  <div
-                    key={step.number}
-                    className="relative flex gap-8 animate-fade-up"
-                    style={{ animationDelay: `${80 + i * 120}ms` }}
-                  >
-                    {/* Circle on timeline */}
-                    <div className="relative z-10 w-11 h-11 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-600/30 border-4 border-stone-50">
+                  <div key={i} className="relative flex gap-8 animate-fade-up" style={{ animationDelay: `${80 + i * 120}ms` }}>
+                    <div className="relative z-10 w-11 h-11 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-600/30 border-4 border-stone-50 dark:border-gray-950">
                       <Icon className="w-4 h-4" />
                     </div>
 
-                    {/* Card */}
-                    <div className="flex-1 bg-white rounded-2xl shadow-sm border border-stone-100 p-6 mb-1">
+                    <div className="flex-1 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-stone-100 dark:border-gray-800 p-6 mb-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">
-                          Step {step.number}
+                        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
+                          {t("sg_step")} {i + 1}
                         </span>
                       </div>
-                      <h3 className="text-lg font-semibold text-stone-900 mb-2">{step.title}</h3>
-                      <p className="text-stone-600 leading-relaxed text-sm">{step.body}</p>
+                      <h3 className="text-lg font-semibold text-stone-900 dark:text-white mb-2">{t(step.titleKey)}</h3>
+                      <p className="text-stone-600 dark:text-stone-400 leading-relaxed text-sm">{t(step.bodyKey)}</p>
                     </div>
                   </div>
                 )
@@ -192,29 +132,26 @@ export default function SustainableGrowthPage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-20 px-6 md:px-12 bg-white">
+      <section className="py-20 px-6 md:px-12 bg-white dark:bg-gray-900">
         <div className="max-w-4xl mx-auto">
-          <div
-            className="flex items-center gap-3 mb-10 animate-fade-up"
-            style={{ animationDelay: '0ms' }}
-          >
-            <span className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 mb-10 animate-fade-up" style={{ animationDelay: '0ms' }}>
+            <span className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <Droplets className="w-5 h-5" />
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold text-stone-900">
-              What This Means for Your Farm
+            <h2 className="text-2xl md:text-3xl font-bold text-stone-900 dark:text-white">
+              {t("sg_benefits_title")}
             </h2>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
-            {benefits.map((benefit, i) => (
+            {benefitKeys.map((key, i) => (
               <div
-                key={i}
-                className="flex items-start gap-3 bg-stone-50 rounded-xl p-4 border border-stone-100 animate-fade-in"
+                key={key}
+                className="flex items-start gap-3 bg-stone-50 dark:bg-gray-800 rounded-xl p-4 border border-stone-100 dark:border-gray-700 animate-fade-in"
                 style={{ animationDelay: `${80 + i * 70}ms` }}
               >
-                <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
-                <span className="text-stone-600 leading-relaxed text-sm">{benefit}</span>
+                <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
+                <span className="text-stone-600 dark:text-stone-400 leading-relaxed text-sm">{t(key)}</span>
               </div>
             ))}
           </div>
@@ -224,32 +161,19 @@ export default function SustainableGrowthPage() {
       {/* The Bigger Picture */}
       <section className="py-20 px-6 md:px-12">
         <div className="max-w-4xl mx-auto">
-          <div
-            className="flex items-center gap-3 mb-8 animate-fade-up"
-            style={{ animationDelay: '0ms' }}
-          >
-            <span className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 mb-8 animate-fade-up" style={{ animationDelay: '0ms' }}>
+            <span className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <Leaf className="w-5 h-5" />
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold text-stone-900">The Bigger Picture</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-stone-900 dark:text-white">{t("sg_bigger_title")}</h2>
           </div>
 
-          <div className="pl-[52px] border-l-2 border-emerald-200 space-y-5">
-            <p
-              className="text-lg text-stone-600 leading-relaxed animate-fade-in"
-              style={{ animationDelay: '100ms' }}
-            >
-              By closing the loop between AI infrastructure and agriculture, Gaia contributes to a circular
-              water economy. Water that would have been wasted is given a second life, and the technology
-              that consumes it pays back into the communities and ecosystems it depends on.
+          <div className="pl-[52px] border-l-2 border-emerald-200 dark:border-emerald-800 space-y-5">
+            <p className="text-lg text-stone-600 dark:text-stone-400 leading-relaxed animate-fade-in" style={{ animationDelay: '100ms' }}>
+              {t("sg_bigger_p1")}
             </p>
-            <p
-              className="text-lg text-stone-600 leading-relaxed animate-fade-in"
-              style={{ animationDelay: '200ms' }}
-            >
-              Our goal is a future where every data centre operating in an agricultural region is paired
-              with a Gaia network — turning an environmental liability into a shared resource that makes
-              both industries more resilient and sustainable.
+            <p className="text-lg text-stone-600 dark:text-stone-400 leading-relaxed animate-fade-in" style={{ animationDelay: '200ms' }}>
+              {t("sg_bigger_p2")}
             </p>
           </div>
         </div>

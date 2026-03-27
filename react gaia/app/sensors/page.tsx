@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useLanguage } from "@/lib/language-context"
+import type { TranslationKey } from "@/lib/translations"
 
 const GRAFANA_BASE = "http://localhost:3000"
 const DASHBOARD_UID = "gaia-sensors"
@@ -23,11 +25,11 @@ const REFRESH_RATES = [
   { label: "5 m",  value: "5m" },
 ]
 
-const panels = [
-  { id: 1, label: "Temperature",  icon: "🌡️" },
-  { id: 2, label: "Humidity",      icon: "💧" },
-  { id: 3, label: "Soil Moisture", icon: "🌱" },
-  { id: 4, label: "Water Events",  icon: "🚿" },
+const panels: { id: number; labelKey: TranslationKey; icon: string }[] = [
+  { id: 1, labelKey: "sensors_temperature",  icon: "🌡️" },
+  { id: 2, labelKey: "sensors_humidity",      icon: "💧" },
+  { id: 3, labelKey: "sensors_soil_moisture", icon: "🌱" },
+  { id: 4, labelKey: "sensors_water_events",  icon: "🚿" },
 ]
 
 function SelectGroup({
@@ -43,8 +45,8 @@ function SelectGroup({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-white/40 text-xs uppercase tracking-widest">{label}</span>
-      <div className="flex rounded-lg overflow-hidden border border-white/10">
+      <span className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest">{label}</span>
+      <div className="flex rounded-lg overflow-hidden border border-gray-200 dark:border-white/10">
         {options.map((opt) => (
           <button
             key={opt.value}
@@ -52,7 +54,7 @@ function SelectGroup({
             className={`px-3 py-1.5 text-xs font-medium transition-colors ${
               value === opt.value
                 ? "bg-amber-400 text-black"
-                : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+                : "bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-white/60 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white"
             }`}
           >
             {opt.label}
@@ -66,6 +68,7 @@ function SelectGroup({
 export default function SensorsPage() {
   const [from, setFrom] = useState("now-7d")
   const [refresh, setRefresh] = useState("30s")
+  const { t } = useLanguage()
 
   function panelUrl(panelId: number) {
     const params = new URLSearchParams({
@@ -77,43 +80,41 @@ export default function SensorsPage() {
       panelId: `panel-${panelId}`,
     })
     if (refresh) params.set("refresh", refresh)
-    // __feature.dashboardScene uses a dot which URLSearchParams encodes — set it raw
     return `${GRAFANA_BASE}/d-solo/${DASHBOARD_UID}/${DASHBOARD_SLUG}?${params.toString().replace("__feature_dashboardScene", "__feature.dashboardScene")}`
   }
 
   const selectedRange = TIME_RANGES.find((r) => r.value === from)?.label ?? ""
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white">
+    <main className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
       {/* Header */}
-      <div className="border-b border-white/10 px-8 py-5 flex items-center gap-4">
-        <span className="text-3xl font-black text-amber-400 tracking-widest">GAIA</span>
-        <div className="w-px h-6 bg-white/20" />
-        <span className="text-white/60 text-sm font-medium uppercase tracking-widest">
-          Sensor Dashboard
+      <div className="border-b border-gray-200 dark:border-white/10 bg-white dark:bg-transparent px-8 py-5 flex items-center gap-4">
+        <span className="text-3xl font-black text-amber-500 dark:text-amber-400 tracking-widest">GAIA</span>
+        <div className="w-px h-6 bg-gray-300 dark:bg-white/20" />
+        <span className="text-gray-400 dark:text-white/60 text-sm font-medium uppercase tracking-widest">
+          {t("sensors_label")}
         </span>
       </div>
 
       {/* Title + controls */}
       <div className="px-8 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">Live Sensor Data</h1>
-          <p className="text-white/50 text-sm">
-            Showing the last {selectedRange}
-            {refresh ? ` · auto-refresh every ${refresh}` : " · auto-refresh off"}.
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{t("sensors_title")}</h1>
+          <p className="text-gray-500 dark:text-white/50 text-sm">
+            {t("sensors_showing")} {selectedRange}
+            {refresh ? ` · ${t("sensors_auto_refresh")} ${refresh}` : ` · ${t("sensors_auto_refresh_off")}`}.
           </p>
         </div>
 
-        {/* Settings controls */}
         <div className="flex flex-col sm:flex-row gap-3">
           <SelectGroup
-            label="Range"
+            label={t("sensors_range")}
             options={TIME_RANGES}
             value={from}
             onChange={setFrom}
           />
           <SelectGroup
-            label="Refresh"
+            label={t("sensors_refresh")}
             options={REFRESH_RATES}
             value={refresh}
             onChange={setRefresh}
@@ -126,11 +127,11 @@ export default function SensorsPage() {
         {panels.map((panel) => (
           <div
             key={panel.id}
-            className="rounded-xl overflow-hidden border border-white/10 bg-[#141414]"
+            className="rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:bg-[#141414]"
           >
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 dark:border-white/10">
               <span className="text-lg">{panel.icon}</span>
-              <span className="text-sm font-semibold text-white/80">{panel.label}</span>
+              <span className="text-sm font-semibold text-gray-700 dark:text-white/80">{t(panel.labelKey)}</span>
             </div>
             <iframe
               key={`${panel.id}-${from}-${refresh}`}
@@ -138,15 +139,15 @@ export default function SensorsPage() {
               width="100%"
               height="260"
               style={{ border: "none" }}
-              title={panel.label}
+              title={t(panel.labelKey)}
               className="block"
             />
           </div>
         ))}
       </div>
 
-      <div className="px-8 pb-8 text-center text-white/25 text-xs">
-        Powered by Grafana · TimescaleDB · GAIA Smart Farm
+      <div className="px-8 pb-8 text-center text-gray-400 dark:text-white/25 text-xs">
+        {t("powered_by")}
       </div>
     </main>
   )

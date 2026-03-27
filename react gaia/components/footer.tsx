@@ -1,7 +1,12 @@
+"use client"
+
 import Link from "next/link"
 import { Github, Mail, MessageCircle } from "lucide-react"
+import { useLanguage } from "@/lib/language-context"
 
 export function Footer() {
+  const { t } = useLanguage()
+
   return (
     <footer className="bg-[#0a0f0c] border-t border-white/5">
       <div className="max-w-6xl mx-auto px-6 py-12">
@@ -47,20 +52,20 @@ export function Footer() {
         {/* Bottom section */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-white/30 text-sm">
-            © {new Date().getFullYear()} Gaia. All rights reserved.
+            © {new Date().getFullYear()} Gaia. {t("footer_rights")}
           </p>
           <nav className="flex items-center gap-6">
             <Link href="/" className="text-white/40 hover:text-white text-sm transition-colors">
-              Home
+              {t("footer_home")}
             </Link>
             <Link href="/#features" className="text-white/40 hover:text-white text-sm transition-colors">
-              Features
+              {t("footer_features")}
             </Link>
             <Link href="/about" className="text-white/40 hover:text-white text-sm transition-colors">
-              About
+              {t("footer_about")}
             </Link>
             <Link href="/login" className="text-white/40 hover:text-white text-sm transition-colors">
-              Login
+              {t("footer_login")}
             </Link>
           </nav>
         </div>

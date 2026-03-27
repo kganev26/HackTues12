@@ -4,8 +4,9 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, LogOut, User, LogIn } from "lucide-react"
+import { useLanguage } from "@/lib/language-context"
 
-const API_URL = "/api"
+const API_URL = "http://10.210.46.104:5500"
 
 interface CurrentUser {
   id: number
@@ -37,12 +38,12 @@ export default function ProfilePage() {
 
   const [profileError, setProfileError] = useState("")
   const router = useRouter()
+  const { t } = useLanguage()
 
   useEffect(() => {
     const token = localStorage.getItem("token")
     if (!token) return
 
-    // Fetch fresh profile data from backend (so mac_address is always current)
     fetch(`${API_URL}/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -52,7 +53,6 @@ export default function ProfilePage() {
         localStorage.setItem("currentUser", JSON.stringify(data))
       })
       .catch(() => {
-        // Fallback to cached localStorage data
         const stored = localStorage.getItem("currentUser")
         if (stored) setUser(JSON.parse(stored))
       })
@@ -121,13 +121,13 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 text-gray-900">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white px-8 py-5 flex items-center gap-4">
+      <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-8 py-5 flex items-center gap-4">
         <span className="text-3xl font-black text-amber-500 tracking-widest">GAIA</span>
-        <div className="w-px h-6 bg-gray-300" />
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
         <span className="text-gray-400 text-sm font-medium uppercase tracking-widest">
-          Profile
+          {t("profile_label")}
         </span>
       </div>
 
@@ -135,63 +135,63 @@ export default function ProfilePage() {
       <div className="px-8 pt-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-gray-700 text-sm transition-colors"
+          className="inline-flex items-center gap-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Home
+          {t("back_to_home")}
         </Link>
       </div>
 
       {/* Content */}
       <div className="px-8 py-10 flex justify-center">
         {user ? (
-          <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+          <div className="w-full max-w-md rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden shadow-sm">
             {/* Card header */}
-            <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
-              <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center">
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+              <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 flex items-center justify-center">
                 <User className="w-5 h-5 text-amber-500" />
               </div>
-              <span className="text-sm font-semibold text-gray-600">Account Details</span>
+              <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">{t("profile_account_details")}</span>
               <button
                 onClick={handleSignOut}
-                className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors"
+                className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                Sign Out
+                {t("profile_sign_out")}
               </button>
             </div>
 
             {/* Fields */}
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
               <div className="px-6 py-4 flex justify-between items-center">
-                <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">Username</span>
-                <span className="text-gray-900 font-semibold">@{user.username}</span>
+                <span className="text-xs uppercase tracking-widest text-gray-700 dark:text-gray-400 font-medium">{t("profile_username")}</span>
+                <span className="text-gray-900 dark:text-gray-100 font-semibold">@{user.username}</span>
               </div>
               <div className="px-6 py-4 flex justify-between items-center">
-                <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">First Name</span>
-                <span className="text-gray-900 font-semibold">{user.firstname}</span>
+                <span className="text-xs uppercase tracking-widest text-gray-700 dark:text-gray-400 font-medium">{t("profile_first_name")}</span>
+                <span className="text-gray-900 dark:text-gray-100 font-semibold">{user.firstname}</span>
               </div>
               <div className="px-6 py-4 flex justify-between items-center">
-                <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">Last Name</span>
-                <span className="text-gray-900 font-semibold">{user.lastname}</span>
+                <span className="text-xs uppercase tracking-widest text-gray-700 dark:text-gray-400 font-medium">{t("profile_last_name")}</span>
+                <span className="text-gray-900 dark:text-gray-100 font-semibold">{user.lastname}</span>
               </div>
 
               {/* MAC Address row */}
               <div className="px-6 py-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">MAC Address</span>
+                  <span className="text-xs uppercase tracking-widest text-gray-700 dark:text-gray-400 font-medium">{t("profile_mac_address")}</span>
                   {!macEditing && (
                     <div className="flex items-center gap-3">
                       {user.mac_address ? (
-                        <span className="text-gray-900 font-semibold font-mono">{user.mac_address}</span>
+                        <span className="text-gray-900 dark:text-gray-100 font-semibold font-mono">{user.mac_address}</span>
                       ) : (
-                        <span className="text-gray-300 text-sm italic">Not set</span>
+                        <span className="text-gray-300 dark:text-gray-600 text-sm italic">{t("not_set")}</span>
                       )}
                       <button
                         onClick={() => { setMacInput(user.mac_address ?? ""); setMacEditing(true); setMacError("") }}
                         className="text-xs text-amber-500 hover:text-amber-600 font-semibold transition-colors"
                       >
-                        {user.mac_address ? "Change" : "Set"}
+                        {user.mac_address ? t("change") : t("set")}
                       </button>
                     </div>
                   )}
@@ -205,20 +205,20 @@ export default function ProfilePage() {
                       onChange={(e) => setMacInput(e.target.value)}
                       placeholder="AA:BB:CC:DD:EE:FF"
                       autoFocus
-                      className="flex-1 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 text-sm font-mono placeholder:text-gray-300 outline-none focus:border-amber-400 transition-colors"
+                      className="flex-1 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 text-sm font-mono placeholder:text-gray-300 dark:placeholder:text-gray-600 outline-none focus:border-amber-400 transition-colors"
                     />
                     <button
                       onClick={handleSaveMac}
                       disabled={macSaving || !macInput.trim()}
                       className="px-4 py-2 bg-green-700 hover:bg-green-800 disabled:opacity-40 text-white rounded-lg text-sm font-bold transition-colors"
                     >
-                      {macSaving ? "Saving…" : "Save"}
+                      {macSaving ? t("saving") : t("save")}
                     </button>
                     <button
                       onClick={() => { setMacEditing(false); setMacError("") }}
-                      className="px-3 py-2 text-gray-400 hover:text-gray-600 rounded-lg text-sm transition-colors"
+                      className="px-3 py-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg text-sm transition-colors"
                     >
-                      Cancel
+                      {t("cancel")}
                     </button>
                   </div>
                 )}
@@ -228,10 +228,10 @@ export default function ProfilePage() {
               {/* Agriculture */}
               {user.agriculture && (
                 <div className="px-6 py-4">
-                  <span className="text-xs uppercase tracking-widest text-gray-700 font-medium block mb-2">Agriculture</span>
+                  <span className="text-xs uppercase tracking-widest text-gray-700 dark:text-gray-400 font-medium block mb-2">{t("profile_agriculture")}</span>
                   <div className="flex flex-wrap gap-1.5">
                     {user.agriculture.split(",").map((a) => (
-                      <span key={a} className="px-2.5 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-xs font-semibold capitalize">
+                      <span key={a} className="px-2.5 py-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 rounded-full text-xs font-semibold capitalize">
                         {a.replace(/_/g, " ")}
                       </span>
                     ))}
@@ -242,8 +242,8 @@ export default function ProfilePage() {
               {/* Country / Province */}
               {(user.country || user.province) && (
                 <div className="px-6 py-4 flex justify-between items-center">
-                  <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">Region</span>
-                  <span className="text-gray-900 font-semibold text-right">
+                  <span className="text-xs uppercase tracking-widest text-gray-700 dark:text-gray-400 font-medium">{t("profile_region")}</span>
+                  <span className="text-gray-900 dark:text-gray-100 font-semibold text-right">
                     {[user.province, user.country].filter(Boolean).join(", ")}
                   </span>
                 </div>
@@ -252,19 +252,19 @@ export default function ProfilePage() {
               {/* Gender */}
               <div className="px-6 py-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">Gender</span>
+                  <span className="text-xs uppercase tracking-widest text-gray-700 dark:text-gray-400 font-medium">{t("profile_gender")}</span>
                   {!genderEditing && (
                     <div className="flex items-center gap-3">
                       {user.gender ? (
-                        <span className="text-gray-900 font-semibold capitalize">{user.gender.replace(/_/g, " ")}</span>
+                        <span className="text-gray-900 dark:text-gray-100 font-semibold capitalize">{user.gender.replace(/_/g, " ")}</span>
                       ) : (
-                        <span className="text-gray-300 text-sm italic">Not set</span>
+                        <span className="text-gray-300 dark:text-gray-600 text-sm italic">{t("not_set")}</span>
                       )}
                       <button
                         onClick={() => { setGenderValue(user.gender ?? ""); setGenderEditing(true) }}
                         className="text-xs text-amber-500 hover:text-amber-600 font-semibold transition-colors"
                       >
-                        {user.gender ? "Change" : "Set"}
+                        {user.gender ? t("change") : t("set")}
                       </button>
                     </div>
                   )}
@@ -274,25 +274,25 @@ export default function ProfilePage() {
                     <select
                       value={genderValue}
                       onChange={(e) => setGenderValue(e.target.value)}
-                      className="flex-1 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 text-sm outline-none focus:border-amber-400 transition-colors"
+                      className="flex-1 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 text-sm outline-none focus:border-amber-400 transition-colors"
                     >
-                      <option value="">Prefer not to say</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
+                      <option value="">{t("profile_prefer_not_to_say")}</option>
+                      <option value="male">{t("profile_male")}</option>
+                      <option value="female">{t("profile_female")}</option>
+                      <option value="other">{t("profile_other")}</option>
                     </select>
                     <button
                       onClick={() => handleSaveProfile("gender", genderValue)}
                       disabled={genderSaving}
                       className="px-4 py-2 bg-green-700 hover:bg-green-800 disabled:opacity-40 text-white rounded-lg text-sm font-bold transition-colors"
                     >
-                      {genderSaving ? "Saving…" : "Save"}
+                      {genderSaving ? t("saving") : t("save")}
                     </button>
                     <button
                       onClick={() => setGenderEditing(false)}
-                      className="px-3 py-2 text-gray-400 hover:text-gray-600 rounded-lg text-sm transition-colors"
+                      className="px-3 py-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg text-sm transition-colors"
                     >
-                      Cancel
+                      {t("cancel")}
                     </button>
                   </div>
                 )}
@@ -301,19 +301,19 @@ export default function ProfilePage() {
               {/* Birth Year */}
               <div className="px-6 py-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs uppercase tracking-widest text-gray-700 font-medium">Birth Year</span>
+                  <span className="text-xs uppercase tracking-widest text-gray-700 dark:text-gray-400 font-medium">{t("profile_birth_year")}</span>
                   {!birthyearEditing && (
                     <div className="flex items-center gap-3">
                       {user.birthyear ? (
-                        <span className="text-gray-900 font-semibold">{user.birthyear}</span>
+                        <span className="text-gray-900 dark:text-gray-100 font-semibold">{user.birthyear}</span>
                       ) : (
-                        <span className="text-gray-300 text-sm italic">Not set</span>
+                        <span className="text-gray-300 dark:text-gray-600 text-sm italic">{t("not_set")}</span>
                       )}
                       <button
                         onClick={() => { setBirthyearValue(user.birthyear ?? ""); setBirthyearEditing(true) }}
                         className="text-xs text-amber-500 hover:text-amber-600 font-semibold transition-colors"
                       >
-                        {user.birthyear ? "Change" : "Set"}
+                        {user.birthyear ? t("change") : t("set")}
                       </button>
                     </div>
                   )}
@@ -323,9 +323,9 @@ export default function ProfilePage() {
                     <select
                       value={birthyearValue}
                       onChange={(e) => setBirthyearValue(e.target.value)}
-                      className="flex-1 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 text-sm outline-none focus:border-amber-400 transition-colors"
+                      className="flex-1 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 text-sm outline-none focus:border-amber-400 transition-colors"
                     >
-                      <option value="">Select year</option>
+                      <option value="">{t("profile_select_year")}</option>
                       {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - 10 - i).map((y) => (
                         <option key={y} value={y}>{y}</option>
                       ))}
@@ -335,13 +335,13 @@ export default function ProfilePage() {
                       disabled={birthyearSaving}
                       className="px-4 py-2 bg-green-700 hover:bg-green-800 disabled:opacity-40 text-white rounded-lg text-sm font-bold transition-colors"
                     >
-                      {birthyearSaving ? "Saving…" : "Save"}
+                      {birthyearSaving ? t("saving") : t("save")}
                     </button>
                     <button
                       onClick={() => setBirthyearEditing(false)}
-                      className="px-3 py-2 text-gray-400 hover:text-gray-600 rounded-lg text-sm transition-colors"
+                      className="px-3 py-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg text-sm transition-colors"
                     >
-                      Cancel
+                      {t("cancel")}
                     </button>
                   </div>
                 )}
@@ -351,39 +351,36 @@ export default function ProfilePage() {
             </div>
           </div>
         ) : (
-          <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-            {/* Card header */}
-            <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
-              <div className="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <User className="w-5 h-5 text-gray-300" />
+          <div className="w-full max-w-md rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden shadow-sm">
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+              <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                <User className="w-5 h-5 text-gray-300 dark:text-gray-600" />
               </div>
-              <span className="text-sm font-semibold text-gray-400">Account Details</span>
+              <span className="text-sm font-semibold text-gray-400">{t("profile_account_details")}</span>
             </div>
 
-            {/* Body */}
             <div className="px-6 py-10 flex flex-col items-center gap-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 flex items-center justify-center">
                 <LogIn className="w-7 h-7 text-amber-400" />
               </div>
               <div>
-                <p className="text-gray-700 font-semibold text-base mb-1">You are not signed in</p>
-                <p className="text-gray-400 text-sm">Sign in to view and manage your account details.</p>
+                <p className="text-gray-700 dark:text-gray-200 font-semibold text-base mb-1">{t("profile_not_signed_in")}</p>
+                <p className="text-gray-400 text-sm">{t("profile_sign_in_prompt")}</p>
               </div>
               <Link
                 href="/login"
                 className="inline-flex items-center gap-2 px-6 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl text-sm font-bold transition-colors"
               >
                 <LogIn className="w-4 h-4" />
-                Go to Login
+                {t("profile_go_to_login")}
               </Link>
             </div>
           </div>
         )}
       </div>
 
-      {/* Footer note */}
-      <div className="px-8 pb-8 text-center text-gray-500 text-xs">
-        Powered by Grafana · TimescaleDB · GAIA Smart Farm
+      <div className="px-8 pb-8 text-center text-gray-500 dark:text-gray-600 text-xs">
+        {t("powered_by")}
       </div>
     </main>
   )
