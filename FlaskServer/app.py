@@ -344,13 +344,30 @@ def remove_mac():
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_id, err_response, err_code = get_user_id_from_request()
-    if err_response:
-        return err_response, err_code
-
     user_message = (request.json or {}).get('message', '').strip()
     if not user_message:
         return jsonify({'message': 'No message provided'}), 400
+    
+    user_id, err_response, err_code = get_user_id_from_request()
+    if err_response:
+        system_prompt = f"You are GAIA, an AI farming assistant helping a random user, not signed in.\n"
+        system_prompt += "The user is bulgarian, so use bulgarian as your default language\n"
+        api_key = os.environ.get('GEMINI_API_KEY')
+        if not api_key:
+            return jsonify({'message': 'AI service not configured (missing GEMINI_API_KEY)'}), 503
+
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=user_message,
+            config=types.GenerateContentConfig(
+            system_instruction=system_prompt,
+            tools=[types.Tool(google_search=types.GoogleSearch())]
+            ),
+        )
+        return jsonify({'reply': response.text}), 200
+
+    
 
     conn = get_db_connection()
     try:
@@ -380,8 +397,9 @@ def chat():
     system_prompt += f"- Location: {', '.join(filter(None, [province, country])) or 'Not specified'}\n"
     system_prompt += f"- Gender: {gender or 'Not specified'}\n"
     system_prompt += f"- Birth year: {birthyear or 'Not specified'}\n\n"
-    system_prompt += "Recent sensor readings (newest first):\n"
     system_prompt += "The user is bulgarian, so use bulgarian as your default language\n"
+    system_prompt += "Recent sensor readings (newest first):\n"
+    
 
     if sensor_rows:
         for r in sensor_rows:
