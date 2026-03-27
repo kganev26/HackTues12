@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ArrowLeft, LogOut, User, LogIn, Bell, BellOff } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { subscribePush, unsubscribePush, isPushSubscribed } from "@/lib/use-notifications"
+import AuthGuard from "@/components/auth-guard"
 
 const API_URL = "http://10.210.46.104:5500"
 
@@ -160,6 +161,7 @@ export default function ProfilePage() {
   }
 
   return (
+    <AuthGuard>
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-8 py-5 flex items-center gap-4">
@@ -440,5 +442,6 @@ export default function ProfilePage() {
         {t("powered_by")}
       </div>
     </main>
+    </AuthGuard>
   )
 }

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { Send, Loader2 } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
+import AuthGuard from "@/components/auth-guard"
 
 const API_URL = "/api"
 
@@ -66,6 +67,7 @@ export default function ChatPage() {
   }
 
   return (
+    <AuthGuard>
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-8 py-5 flex items-center gap-4 shrink-0">
@@ -148,5 +150,6 @@ export default function ChatPage() {
         <p className="text-center text-gray-400 dark:text-white/20 text-xs mt-2">{t("chat_hint")}</p>
       </div>
     </div>
+    </AuthGuard>
   )
 }

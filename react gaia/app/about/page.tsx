@@ -11,6 +11,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import AuthGuard from "@/components/auth-guard"
 
 const sections = [
   { id: "what-is-gaia", icon: Sprout, titleKey: "about_what_is_gaia_title" as TranslationKey, contentKey: "about_what_is_gaia" as TranslationKey },
@@ -26,6 +27,7 @@ export default function AboutPage() {
   const { t } = useLanguage()
 
   return (
+    <AuthGuard>
     <main className="min-h-screen bg-gradient-to-b from-stone-50 to-stone-100 dark:from-gray-950 dark:to-gray-900 flex flex-col">
 
       {/* Header */}
@@ -69,5 +71,6 @@ export default function AboutPage() {
 
       <Footer />
     </main>
+    </AuthGuard>
   )
 }
