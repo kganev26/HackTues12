@@ -382,7 +382,7 @@ def chat():
 
     system_prompt += "\nGive concise, practical farming advice based on their data."
 
-    api_key = os.getenv('GEMINI_API_KEY')
+    api_key = 'AIzaSyD0ehv-XDVxjWtkEqeYmKC8-MzHF73rqb8'
     if not api_key:
         return jsonify({'message': 'AI service not configured (missing GEMINI_API_KEY)'}), 503
 
