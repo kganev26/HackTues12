@@ -148,9 +148,7 @@ export default function ProfilePage() {
           <div className="w-full max-w-md rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden shadow-sm">
             {/* Card header */}
             <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-              <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 flex items-center justify-center">
-                <User className="w-5 h-5 text-amber-500" />
-              </div>
+              
               <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">{t("profile_account_details")}</span>
               <button
                 onClick={handleSignOut}
