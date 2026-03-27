@@ -99,10 +99,10 @@ export default function SensorsPage() {
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-white/10 bg-white dark:bg-transparent px-8 py-5 flex items-center gap-4">
-        <span className="text-3xl font-black text-amber-500 dark:text-amber-400 tracking-widest">GAIA</span>
-        <div className="w-px h-6 bg-gray-300 dark:bg-white/20" />
-        <span className="text-gray-400 dark:text-white/60 text-sm font-medium uppercase tracking-widest">
+      <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-8 py-5 flex items-center gap-4">
+        <Link href="/" className="text-3xl font-black text-amber-500 tracking-widest hover:opacity-80 transition-opacity">GAIA</Link>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
+        <span className="text-gray-400 text-sm font-medium uppercase tracking-widest">
           {t("sensors_label")}
         </span>
       </div>

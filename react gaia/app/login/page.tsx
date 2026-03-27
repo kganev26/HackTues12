@@ -3,7 +3,6 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 const API_URL = "http://10.210.46.104:5500"
@@ -148,14 +147,13 @@ export default function LoginPage() {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/70" />
 
-      {/* Back Link */}
+      {/* Logo link */}
       <Link
         href="/"
-        className="absolute top-6 left-6 z-20 flex items-center gap-2 text-white/80 hover:text-white transition-colors animate-fade-in"
+        className="absolute top-6 left-6 z-20 text-3xl font-black text-amber-400 tracking-widest hover:opacity-80 transition-opacity animate-fade-in"
         style={{ animationDelay: '0ms' }}
       >
-        <ArrowLeft className="w-5 h-5" />
-        <span>{t("back_to_home")}</span>
+        GAIA
       </Link>
 
       {/* Form Container */}
