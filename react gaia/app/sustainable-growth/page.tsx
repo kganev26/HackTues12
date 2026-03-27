@@ -5,6 +5,7 @@ import { Leaf, Droplets, Factory, CheckCircle } from "lucide-react"
 import { Footer } from "@/components/footer"
 import { useLanguage } from "@/lib/language-context"
 import type { TranslationKey } from "@/lib/translations"
+import AuthGuard from "@/components/auth-guard"
 
 const benefitKeys: TranslationKey[] = [
   "sg_benefit_1", "sg_benefit_2", "sg_benefit_3",
@@ -15,6 +16,7 @@ export default function SustainableGrowthPage() {
   const { t } = useLanguage()
 
   return (
+    <AuthGuard>
     <main className="min-h-screen bg-gradient-to-b from-stone-50 to-stone-100 dark:from-gray-950 dark:to-gray-900">
 
       {/* Header */}
@@ -99,5 +101,6 @@ export default function SustainableGrowthPage() {
 
       <Footer />
     </main>
+    </AuthGuard>
   )
 }

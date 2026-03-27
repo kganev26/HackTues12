@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useLanguage } from "@/lib/language-context"
 import type { TranslationKey } from "@/lib/translations"
+import AuthGuard from "@/components/auth-guard"
 
 const GRAFANA_BASE = "http://10.210.46.104:3000"
 const DASHBOARD_UID = "gaia-sensors"
@@ -97,6 +98,7 @@ export default function SensorsPage() {
   const selectedRange = TIME_RANGES.find((r) => r.value === from)?.label ?? ""
 
   return (
+    <AuthGuard>
     <main className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-8 py-5 flex items-center gap-4">
@@ -161,5 +163,6 @@ export default function SensorsPage() {
         {t("powered_by")}
       </div>
     </main>
+    </AuthGuard>
   )
 }
