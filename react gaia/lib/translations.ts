@@ -87,6 +87,10 @@ export const translations = {
     profile_male: "Male",
     profile_female: "Female",
     profile_other: "Other",
+    profile_notifications: "Notifications",
+    profile_notif_enabled: "Enabled",
+    profile_notif_disabled: "Disabled",
+    profile_notif_denied: "Blocked in browser",
     profile_not_signed_in: "You are not signed in",
     profile_sign_in_prompt: "Sign in to view and manage your account details.",
     profile_go_to_login: "Go to Login",
@@ -152,6 +156,14 @@ export const translations = {
     sensors_humidity: "Humidity",
     sensors_soil_moisture: "Soil Moisture",
     sensors_water_events: "Water Events",
+
+    // Notifications
+    notif_high_temp: "High temperature",
+    notif_low_temp: "Low temperature",
+    notif_low_humidity: "Low humidity",
+    notif_low_soil: "Low soil moisture",
+    notif_high_soil: "High soil moisture",
+    notif_water_detected: "Water detected on sensor!",
 
     // Chat page
     chat_back: "Back",
@@ -250,6 +262,10 @@ export const translations = {
     profile_male: "Мъж",
     profile_female: "Жена",
     profile_other: "Друг",
+    profile_notifications: "Известия",
+    profile_notif_enabled: "Включени",
+    profile_notif_disabled: "Изключени",
+    profile_notif_denied: "Блокирани в браузъра",
     profile_not_signed_in: "Не сте влезли в профила си",
     profile_sign_in_prompt: "Влезте, за да видите и управлявате данните за акаунта си.",
     profile_go_to_login: "Към входа",
@@ -315,6 +331,14 @@ export const translations = {
     sensors_humidity: "Влажност",
     sensors_soil_moisture: "Влага на почвата",
     sensors_water_events: "Водни събития",
+
+    // Notifications
+    notif_high_temp: "Висока температура",
+    notif_low_temp: "Ниска температура",
+    notif_low_humidity: "Ниска влажност",
+    notif_low_soil: "Ниска влага на почвата",
+    notif_high_soil: "Висока влага на почвата",
+    notif_water_detected: "Открита вода на сензора!",
 
     // Chat page
     chat_back: "Назад",

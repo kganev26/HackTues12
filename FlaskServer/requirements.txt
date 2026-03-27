@@ -3,3 +3,6 @@ flask-cors
 psycopg2-binary
 PyJWT
 google-generativeai
+pywebpush
+cryptography
+python-dotenv
