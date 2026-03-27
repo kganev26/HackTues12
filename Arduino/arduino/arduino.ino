@@ -2,21 +2,28 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
+#include <Servo.h> // <-- Добавена библиотека за сервото (Added Servo library)
 
 // --- Настройки на пиновете (Pin Settings) ---
 #define DHTPIN D1      
 #define DHTTYPE DHT11
-#define WATER_PIN D5
 #define BUZZER_PIN D2  // Лампа/Зумер
-#define SOIL_PIN A0    // <-- Новият пин за почвата (New soil pin)
+#define SOIL_PIN A0    // Пин за почвата (Soil pin)
+
+// ВАЖНО: Преместихме WATER_PIN на D6, защото Сервото вече е на D5!
+#define SERVO_PIN D5   // <-- Новият пин за сервото
+
+// --- Настройки за поливането (Watering Settings) ---
+const int DRY_SOIL_THRESHOLD = 30; // Процентът, при който се задейства сервото
 
 // --- WiFi и Сървър настройки ---  
 const char* ssid = "bob";
 const char* password = "12345678";
 const char* serverURL = "http://10.210.46.104:5500/receive";
 
-// --- Инициализация на сензорите ---
+// --- Инициализация на обектите ---
 DHT dht(DHTPIN, DHTTYPE);
+Servo myServo; // Създаваме обекта за сервото
 
 void setup() {
   // 1. НАЙ-ПЪРВО: Принудително изключваме лампата
@@ -41,36 +48,42 @@ void setup() {
 
   // 3. Стартиране на сензорите
   dht.begin();
-  pinMode(WATER_PIN, INPUT);
 
   Serial.println("[Система] Всички модули са готови!\n");
 }
 
 void loop() {
   // Даваме време на DHT11 да се подготви
-  delay(20000); 
-
+  delay(10000);
+  
   // --- Четене на сензорите ---
   float dhtTemp = dht.readTemperature();
   float dhtHum = dht.readHumidity();
-  bool waterDetected = (digitalRead(WATER_PIN) == HIGH);
 
   // Четене на почвата (Soil Moisture)
   int rawMoisture = analogRead(SOIL_PIN);
-  int moisturePercent = map(rawMoisture, 1024, 350, 0, 100); 
+  int moisturePercent = map(rawMoisture, 15, 700, 0, 100); 
   
-  if (moisturePercent < 0) moisturePercent = 0;
-  if (moisturePercent > 100) moisturePercent = 100;
+  // Ограничаваме процентите между 0 и 100, за да няма бъгове (150% или -10%)
+  moisturePercent = constrain(moisturePercent, 0, 100);
 
   if (isnan(dhtTemp)) dhtTemp = 0.0;
   if (isnan(dhtHum)) dhtHum = 0.0;
 
-  // --- ЛОГИКА ЗА ЛАМПАТА/ЗУМЕРА ---
-  if (waterDetected) {
-    digitalWrite(BUZZER_PIN, HIGH); 
+
+  // --- ЛОГИКА ЗА СЕРВО МОТОРА (SERVO LOGIC) ---
+  myServo.attach(SERVO_PIN); 
+  
+  if (moisturePercent < DRY_SOIL_THRESHOLD) {
+    Serial.println("[Серво] Влажността е над 30%! Завъртане на MAX (180 градуса)...");
+    myServo.write(180); // Максимална позиция
   } else {
-    digitalWrite(BUZZER_PIN, LOW);  
+    Serial.println("[Серво] Влажността е под 30%. Връщане в начална позиция (0 градуса)...");
+    myServo.write(0);   // Начална позиция
   }
+  
+  delay(500); // Даваме на моторчето половин секунда да стигне до позицията си
+  myServo.detach(); // Откачаме сервото, за да не трепти
 
   // --- Принтиране в Серийния монитор ---
   Serial.println("┌──────────────────────────────────┐");
@@ -78,7 +91,6 @@ void loop() {
   Serial.printf("│ Влажност:    %.2f %%            │\n", dhtHum);
   Serial.printf("│ Влажност почва: %d %%           │\n", moisturePercent);
   Serial.println("├──────────────────────────────────┤");
-  Serial.printf("│ Вода: %-26s │\n", waterDetected ? "ЗАСЕЧЕНА ⚠" : "СУХО");
   Serial.println("└──────────────────────────────────┘");
 
   // --- Създаване на JSON ---
@@ -88,11 +100,10 @@ void loop() {
   jsonPayload += "\"dht_temp\":" + String(dhtTemp) + ",";
   jsonPayload += "\"dht_hum\":" + String(dhtHum) + ",";
   jsonPayload += "\"soil_moisture\":" + String(moisturePercent) + ","; 
-  jsonPayload += "\"water_detected\":" + String(waterDetected ? "true" : "false");
+  jsonPayload += "\"water_detected\":" + String("false");
   jsonPayload += "}";
 
   // Изчакваме 3 секунди преди изпращане
-  delay(3000); 
   
   sendDataToServer(jsonPayload);
 }
