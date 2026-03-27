@@ -13,7 +13,7 @@ import math
 
 
 DB_CONFIG = {
-    "host": "10.210.46.104",
+    "host": "localhost",
     "database": "smartfarm",
     "user": "farm_admin",
     "password": "hackathon_password",
@@ -79,8 +79,8 @@ def seed():
 
     cur.executemany(
         """
-        INSERT INTO sensor_data (time, temperature, humidity, soil_moisture, water_detected)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO sensor_data (time, temperature, humidity, soil_moisture, water_detected, user_id)
+        VALUES (%s, %s, %s, %s, %s, 6)
         """,
         records,
     )
