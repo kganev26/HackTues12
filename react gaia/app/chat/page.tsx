@@ -74,12 +74,6 @@ export default function ChatPage() {
         <Link href="/" className="text-3xl font-black text-amber-500 tracking-widest hover:opacity-80 transition-opacity">GAIA</Link>
         <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
         <span className="text-gray-400 text-sm font-medium uppercase tracking-widest">{t("chat_ai_assistant")}</span>
-        <Link
-          href="/profile"
-          className="ml-auto text-gray-400 dark:text-white/40 hover:text-gray-700 dark:hover:text-white/70 text-xs uppercase tracking-widest transition-colors"
-        >
-          {t("chat_profile")}
-        </Link>
       </div>
 
       {/* Messages */}

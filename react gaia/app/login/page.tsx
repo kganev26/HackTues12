@@ -108,7 +108,7 @@ export default function LoginPage() {
 
       localStorage.setItem("token", data.token)
       localStorage.setItem("currentUser", JSON.stringify(data.user))
-      router.push("/profile")
+      router.push("/sensors")
     } catch {
       setError("Cannot connect to server")
     }
