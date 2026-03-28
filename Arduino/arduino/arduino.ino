@@ -2,12 +2,11 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
-#include <Servo.h> // <-- Добавена библиотека за сервото (Added Servo library)
+#include <Servo.h>
 
 // --- Настройки на пиновете (Pin Settings) ---
 #define DHTPIN D1      
 #define DHTTYPE DHT11
-#define BUZZER_PIN D2  // Лампа/Зумер
 #define SOIL_PIN A0    // Пин за почвата (Soil pin)
 
 // ВАЖНО: Преместихме WATER_PIN на D6, защото Сервото вече е на D5!
@@ -26,15 +25,10 @@ DHT dht(DHTPIN, DHTTYPE);
 Servo myServo; // Създаваме обекта за сервото
 
 void setup() {
-  // 1. НАЙ-ПЪРВО: Принудително изключваме лампата
-  pinMode(BUZZER_PIN, OUTPUT);
-  digitalWrite(BUZZER_PIN, LOW); 
-
   Serial.begin(9600);
   delay(100);
   Serial.println("\n[Система] Инициализация...");
-
-  // 2. След това стартираме WiFi
+  //Стартираме WiFi
   WiFi.mode(WIFI_STA); // Задаваме режим Station за правилен MAC адрес (Set Station mode)
   WiFi.begin(ssid, password);
   Serial.print("[WiFi] Свързване към ");
@@ -46,7 +40,7 @@ void setup() {
   Serial.println("\n[WiFi] Успешно свързване! IP: " + WiFi.localIP().toString());
   Serial.println("[WiFi] MAC Адрес: " + WiFi.macAddress());
 
-  // 3. Стартиране на сензорите
+  //Стартиране на сензорите
   dht.begin();
 
   Serial.println("[Система] Всички модули са готови!\n");
@@ -54,9 +48,9 @@ void setup() {
 
 void loop() {
   // Даваме време на DHT11 да се подготви
-  delay(10000);
+  delay(3000);
   
-  // --- Четене на сензорите ---
+  // --- Четене на dht ---
   float dhtTemp = dht.readTemperature();
   float dhtHum = dht.readHumidity();
 
@@ -75,16 +69,16 @@ void loop() {
   myServo.attach(SERVO_PIN); 
   
   if (moisturePercent < DRY_SOIL_THRESHOLD) {
-    Serial.println("[Серво] Влажността е ПОД 30%! Завъртане на MAX (180 градуса)...");
+    Serial.println("[Серво] Влажността е над 30%! Завъртане на MAX (180 градуса)...");
     myServo.write(180); // Максимална позиция (отваря кранчето)
   } else {
-    Serial.println("[Серво] Влажността е НАД 30%. Връщане в начална позиция (0 градуса)...");
+    Serial.println("[Серво] Влажността е под 30%. Връщане в начална позиция (0 градуса)...");
     myServo.write(0);   // Начална позиция (затваря кранчето)
   }
   
   delay(500); 
   myServo.detach();
-  // --- Принтиране в Серийния монитор ---
+  // --- Принтиране в Serial Monitor ---
   Serial.println("┌──────────────────────────────────┐");
   Serial.printf("│ Температура: %.2f °C            │\n", dhtTemp);
   Serial.printf("│ Влажност:    %.2f %%            │\n", dhtHum);
@@ -93,7 +87,6 @@ void loop() {
   Serial.println("└──────────────────────────────────┘");
 
   // --- Създаване на JSON ---
-  // Добавяме MAC адреса като стринг в началото на JSON-а
   String jsonPayload = "{";
   jsonPayload += "\"mac_address\":\"" + WiFi.macAddress() + "\",";
   jsonPayload += "\"dht_temp\":" + String(dhtTemp) + ",";
@@ -101,10 +94,9 @@ void loop() {
   jsonPayload += "\"soil_moisture\":" + String(moisturePercent) + ","; 
   jsonPayload += "\"water_detected\":" + String("false");
   jsonPayload += "}";
-
-  // Изчакваме 3 секунди преди изпращане
   
   sendDataToServer(jsonPayload);
+  delay(20000);
 }
 
 // --- Функция за изпращане на данните ---
