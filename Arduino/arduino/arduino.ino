@@ -13,8 +13,7 @@
 #define SERVO_PIN D5   // <-- Новият пин за сервото
 
 // --- Настройки за поливането (Watering Settings) ---
-const int DRY_SOIL_THRESHOLD = 30; // Процентът, при който се задейства сервото
-
+const int DRY_SOIL_THRESHOLD = 20; // Процентът, при който се задейства сервото
 // --- WiFi и Сървър настройки ---  
 const char* ssid = "bob";
 const char* password = "12345678";
@@ -95,8 +94,10 @@ void loop() {
   jsonPayload += "\"water_detected\":" + String("false");
   jsonPayload += "}";
   
-  sendDataToServer(jsonPayload);
-  delay(20000);
+  if(sendDataToServer(jsonPayload)){
+    //ESP.deepSleep(30000000);
+    delay(20000);
+  }
 }
 
 // --- Функция за изпращане на данните ---
