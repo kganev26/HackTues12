@@ -7,6 +7,10 @@ const char* password = "BatManSavage1976";
 //const char* serverURL = "http://192.168.0.127:5500/receive";
 const unsigned int localPort = 4210; 
 
+#define PUMP_PIN D1
+#define WATERING_TIME 5000
+#define SOIL_THRESHOLD 30
+
 typedef struct struct_message {
     float dhtTemp;
     float dhtHum;
@@ -28,9 +32,23 @@ WiFiUDP Udp;
   }
 }
 */
-
+void checkMoistureAndPump(int moisture) {
+  // Проверете дали сензорът ви отчита по-висока или по-ниска стойност при суха почва!
+  // Обикновено при капацитивни сензори висока стойност = сухо.
+  if (moisture < SOIL_THRESHOLD) { 
+    Serial.println("[PUMP] Soil is dry! Starting pump...");
+    digitalWrite(PUMP_PIN, HIGH); // Или LOW, ако релето е Active Low
+    delay(WATERING_TIME);
+    digitalWrite(PUMP_PIN, LOW);
+    Serial.println("[PUMP] Watering finished.");
+  } else {
+    Serial.println("[PUMP] Soil is wet enough.");
+  }
+}
 void setup() {
   Serial.begin(115200);
+  pinMode(PUMP_PIN, OUTPUT);
+  digitalWrite(PUMP_PIN, LOW);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500); Serial.print(".");
@@ -49,5 +67,6 @@ void loop() {
     incomingData.dhtTemp, incomingData.dhtHum, incomingData.soilMoisture);
     
    // sendDataToBackend(incomingData.dhtTemp, incomingData.dhtHum, incomingData.soilMoisture);
+    checkMoistureAndPump(incomingData.soilMoisture);
   }
 }
