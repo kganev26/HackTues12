@@ -62,21 +62,6 @@ void loop() {
 
   if (isnan(dhtTemp)) dhtTemp = 0.0;
   if (isnan(dhtHum)) dhtHum = 0.0;
-
-
-// --- ЛОГИКА ЗА СЕРВО МОТОРА (SERVO LOGIC) ---
-  myServo.attach(SERVO_PIN); 
-  
-  if (moisturePercent < DRY_SOIL_THRESHOLD) {
-    Serial.println("[Серво] Влажността е над 30%! Завъртане на MAX (180 градуса)...");
-    myServo.write(180); // Максимална позиция (отваря кранчето)
-  } else {
-    Serial.println("[Серво] Влажността е под 30%. Връщане в начална позиция (0 градуса)...");
-    myServo.write(0);   // Начална позиция (затваря кранчето)
-  }
-  
-  delay(500); 
-  myServo.detach();
   // --- Принтиране в Serial Monitor ---
   Serial.println("┌──────────────────────────────────┐");
   Serial.printf("│ Температура: %.2f °C            │\n", dhtTemp);
@@ -99,8 +84,6 @@ void loop() {
     delay(20000);
   }
 }
-
-// --- Функция за изпращане на данните ---
 int sendDataToServer(String jsonPayload) {
   if (WiFi.status() == WL_CONNECTED) {
     WiFiClient client;
